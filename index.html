@@ -181,18 +181,6 @@ body{font-family:system-ui,sans-serif;font-size:14px;color:#1a1a1a;background:#f
     <span style="color:#185FA5;font-size:18px">›</span>
   </div>
   <div id="form-acesso" class="hidden">
-    <!-- Barra de progresso -->
-    <div class="progress-wrap" id="prog-acesso-wrap">
-      <div class="progress-header">
-        <span class="progress-label">Progresso do formulário</span>
-        <span class="progress-pct" id="prog-acesso-pct">0%</span>
-      </div>
-      <div class="progress-bar-bg">
-        <div class="progress-bar-fill" id="prog-acesso-bar" style="width:0%"></div>
-      </div>
-      <div class="progress-steps" id="prog-acesso-steps"></div>
-    </div>
-
     <div class="sec">
       <div class="sec-title">Tipo de solicitação</div>
       <div class="field">
@@ -314,18 +302,6 @@ body{font-family:system-ui,sans-serif;font-size:14px;color:#1a1a1a;background:#f
 
   <!-- FORM LOTACAO -->
   <div id="form-lotacao" class="hidden">
-    <!-- Barra de progresso -->
-    <div class="progress-wrap" id="prog-lot-wrap">
-      <div class="progress-header">
-        <span class="progress-label">Progresso do formulário</span>
-        <span class="progress-pct" id="prog-lot-pct">0%</span>
-      </div>
-      <div class="progress-bar-bg">
-        <div class="progress-bar-fill" id="prog-lot-bar" style="width:0%"></div>
-      </div>
-      <div class="progress-steps" id="prog-lot-steps"></div>
-    </div>
-
     <div class="sec">
       <div class="sec-title">Quem está preenchendo?</div>
       <div class="field">
@@ -1211,92 +1187,14 @@ function validarEmailInst(){
   }
 }
 
-// ══════════════════════════════════════════════
-//  BARRA DE PROGRESSO — ACESSO
-// ══════════════════════════════════════════════
-const PASSOS_ACESSO=[
-  {id:'solicitacao', label:'Tipo de solicitação', tipo:'radio'},
-  {id:'plataforma',  label:'Qual acesso',          tipo:'radio'},
-  {id:'ac-nome',     label:'Nome',                 tipo:'text'},
-  {id:'ac-mat',      label:'Matrícula',             tipo:'text'},
-  {id:'ac-cpf',      label:'CPF',                  tipo:'cpf'},
-  {id:'ac-funcao',   label:'Função',               tipo:'select'},
-  {id:'ac-escola',   label:'Escola',               tipo:'select'},
-  {id:'ac-wpp',      label:'WhatsApp',             tipo:'tel'},
-  {id:'ac-email-pes',label:'E-mail pessoal',       tipo:'email'},
-  {id:'ecit',        label:'ECIT',                 tipo:'radio'},
-  {id:'licenca-ac',  label:'Licença',              tipo:'radio'},
-];
-
 function atualizarProgressoAcesso(){
-  let feitos=0;
-  const total=PASSOS_ACESSO.length;
-  const stepEls=[];
-  PASSOS_ACESSO.forEach(p=>{
-    let ok=false;
-    if(p.tipo==='radio') ok=!!radios[p.id];
-    else if(p.tipo==='cpf') ok=(document.getElementById(p.id)||{value:''}).value.replace(/\D/g,'').length===11;
-    else if(p.tipo==='tel') ok=(document.getElementById(p.id)||{value:''}).value.replace(/\D/g,'').length>=10;
-    else if(p.tipo==='email') ok=/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test((document.getElementById(p.id)||{value:''}).value.trim());
-    else if(p.tipo==='select') ok=!!(document.getElementById(p.id)||{value:''}).value;
-    else ok=(document.getElementById(p.id)||{value:''}).value.trim().length>=2;
-    if(ok) feitos++;
-    stepEls.push({label:p.label,ok});
-  });
-  const pct=Math.round(feitos/total*100);
-  document.getElementById('prog-acesso-pct').textContent=pct+'%';
-  document.getElementById('prog-acesso-bar').style.width=pct+'%';
-  // Encontra o próximo passo a completar
-  const proximo=stepEls.findIndex(s=>!s.ok);
-  document.getElementById('prog-acesso-steps').innerHTML=stepEls.map((s,i)=>`
-    <span class="progress-step ${s.ok?'done':i===proximo?'active':''}">${s.label}</span>`).join('');
+  // Barra de progresso removida — função mantida vazia porque é chamada em
+  // vários eventos (oninput/onchange) espalhados pelo formulário de acesso.
 }
 
-// ══════════════════════════════════════════════
-//  BARRA DE PROGRESSO — LOTAÇÃO
-// ══════════════════════════════════════════════
-const PASSOS_LOTACAO=[
-  {id:'quem',        label:'Quem preenche',    tipo:'radio'},
-  {id:'lot-prof',    label:'Nome',             tipo:'text'},
-  {id:'lot-mat',     label:'Matrícula',        tipo:'text'},
-  {id:'lot-wpp',     label:'WhatsApp',         tipo:'tel'},
-  {id:'lot-email',   label:'E-mail',           tipo:'email'},
-  {id:'lot-escola',  label:'Escola',           tipo:'select'},
-  {id:'siage',       label:'SIAGE',            tipo:'radio'},
-  {id:'comp',        label:'Complementação',   tipo:'radio'},
-  {id:'lic',         label:'Licença',          tipo:'radio'},
-  {id:'mudou',       label:'Mudou de escola',  tipo:'radio'},
-];
-
 function atualizarProgressoLotacao(){
-  // Inclui escola de complementação se necessário
-  let passos=[...PASSOS_LOTACAO];
-  if(radios['comp']==='sim'){
-    const jatem=passos.find(p=>p.id==='lot-escola-comp');
-    if(!jatem) passos.push({id:'lot-escola-comp',label:'Escola comp.',tipo:'select'});
-  }
-  // Inclui documentos
-  passos.push({id:'__docs__',label:'Documentos',tipo:'docs'});
-
-  let feitos=0;
-  const total=passos.length;
-  const stepEls=[];
-  passos.forEach(p=>{
-    let ok=false;
-    if(p.tipo==='radio') ok=!!radios[p.id];
-    else if(p.tipo==='tel') ok=(document.getElementById(p.id)||{value:''}).value.replace(/\D/g,'').length>=10;
-    else if(p.tipo==='email') ok=/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test((document.getElementById(p.id)||{value:''}).value.trim());
-    else if(p.tipo==='docs') ok=arquivosSelecionados.length>0;
-    else ok=(document.getElementById(p.id)||{value:''}).value.trim().length>=2;
-    if(ok) feitos++;
-    stepEls.push({label:p.label,ok});
-  });
-  const pct=Math.round(feitos/total*100);
-  document.getElementById('prog-lot-pct').textContent=pct+'%';
-  document.getElementById('prog-lot-bar').style.width=pct+'%';
-  const proximo=stepEls.findIndex(s=>!s.ok);
-  document.getElementById('prog-lot-steps').innerHTML=stepEls.map((s,i)=>`
-    <span class="progress-step ${s.ok?'done':i===proximo?'active':''}">${s.label}</span>`).join('');
+  // Barra de progresso removida — função mantida vazia porque é chamada em
+  // vários eventos (oninput/onchange) espalhados pelo formulário de lotação.
 }
 
 // ══════════════════════════════════════════════
@@ -2891,15 +2789,6 @@ function resetForm(){
   // Limpa validação visual
   document.querySelectorAll('.valid,.invalid').forEach(el=>el.classList.remove('valid','invalid'));
   document.querySelectorAll('.field-error').forEach(el=>el.classList.remove('visible'));
-  // Reseta barras de progresso
-  ['acesso','lot'].forEach(k=>{
-    const bar=document.getElementById('prog-'+k+'-bar');
-    const pct=document.getElementById('prog-'+k+'-pct');
-    const steps=document.getElementById('prog-'+k+'-steps');
-    if(bar) bar.style.width='0%';
-    if(pct) pct.textContent='0%';
-    if(steps) steps.innerHTML='';
-  });
 }
 
 // ══════════════════════════════════════════════
