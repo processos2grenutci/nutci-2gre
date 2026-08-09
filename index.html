@@ -2589,6 +2589,14 @@ function renderPendenciaPublica(s){
       <div id="pend-status-${s.id}" style="font-size:12px"></div>
     </div>`;
   }
+  if(s.pendenciaTipo==='acao'){
+    return `<div style="border-top:1px solid #F5D97A;padding-top:.75rem;margin-top:.75rem">
+      <div style="font-size:12px;font-weight:600;color:#92680A;margin-bottom:6px">✅ Ação necessária</div>
+      ${s.pendenciaObs?`<div style="font-size:12px;color:#7a5c10;margin-bottom:8px;line-height:1.5">${s.pendenciaObs}</div>`:''}
+      <button class="btn-sm primary" id="pend-btn-${s.id}" onclick="responderAcaoPendencia(${s.id})" style="width:100%">✅ Já atualizei</button>
+      <div id="pend-status-${s.id}" style="font-size:12px;margin-top:6px"></div>
+    </div>`;
+  }
   return '';
 }
 
@@ -2641,6 +2649,26 @@ async function responderDocumentoPendencia(inp, solId){
     if(statusEl){ statusEl.textContent='✓ Documento enviado! Aguarde a revisão do NUTCI.'; statusEl.style.color='#0F6E56'; }
   }catch(e){
     if(statusEl){ statusEl.textContent='Erro ao enviar: '+e.message; statusEl.style.color='#A32D2D'; }
+  }
+}
+
+async function responderAcaoPendencia(solId){
+  const btn=document.getElementById('pend-btn-'+solId);
+  const statusEl=document.getElementById('pend-status-'+solId);
+  if(btn) btn.disabled=true;
+  if(statusEl){ statusEl.textContent='Enviando confirmação...'; statusEl.style.color='#666'; }
+  try{
+    const resp=await fetch(SHEETS_URL,{
+      method:'POST',
+      headers:{'Content-Type':'text/plain'},
+      body:JSON.stringify({id:solId, _operacao:'responderAcao'})
+    });
+    const data=await resp.json();
+    if(!data.ok) throw new Error(data.erro||'Não foi possível enviar.');
+    if(statusEl){ statusEl.textContent='✓ Confirmação enviada! Aguarde a revisão do NUTCI.'; statusEl.style.color='#0F6E56'; }
+  }catch(e){
+    if(statusEl){ statusEl.textContent='Erro: '+e.message+'. Tente novamente.'; statusEl.style.color='#A32D2D'; }
+    if(btn) btn.disabled=false;
   }
 }
 
@@ -3606,6 +3634,13 @@ function togglePendenciaMinimizada(id){
   if(bloco) bloco.outerHTML=renderPendenciaForm(solicitacoes[idx]);
 }
 
+const TEXTO_PADRAO_ACAO_SIAGE='Professor(a), identificamos que sua Formação Acadêmica (diplomas) ainda não foi atualizada no seu perfil do SIAGE. Isso é necessário para que o SGMOP possa dar continuidade à sua lotação. Acesse seu perfil no SIAGE, vá até a aba "Formação Acadêmica" e inclua seus diplomas. Depois, clique no botão abaixo pra nos avisar.';
+
+function usarTextoPadraoAcao(id){
+  const ta=document.getElementById('pend-obs-'+id);
+  if(ta) ta.value=TEXTO_PADRAO_ACAO_SIAGE;
+}
+
 function renderPendenciaForm(s){
   const minimizado=_pendenciasMinimizadas.has(s.id);
   const campos = CAMPOS_CORRIGIVEIS[s.tipo]||[];
@@ -3614,7 +3649,7 @@ function renderPendenciaForm(s){
   const campoOpts = campos.map(c=>`<option value="${c.key}" ${campoAtual===c.key?'selected':''}>${c.label}</option>`).join('');
   const valorAtual = campoAtual ? (s[campoAtual]??'') : '';
   const rotuloCampo = campoAtual ? (campos.find(c=>c.key===campoAtual)?.label||campoAtual) : '';
-  const resumoTipo = tipoPend==='campo' ? ('Correção de campo'+(rotuloCampo?': '+rotuloCampo:'')) : tipoPend==='documento' ? 'Envio de documentação' : 'não definida ainda';
+  const resumoTipo = tipoPend==='campo' ? ('Correção de campo'+(rotuloCampo?': '+rotuloCampo:'')) : tipoPend==='documento' ? 'Envio de documentação' : tipoPend==='acao' ? 'Confirmação de ação (SIAGE)' : 'não definida ainda';
   return `<div id="pend-block-${s.id}" style="margin-top:8px;padding:10px;background:#FEF9EC;border:1px solid #F5D97A;border-radius:8px">
     <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:${minimizado?'0':'6px'}">
       <div style="font-size:12px;font-weight:600;color:#92680A">Pendência para o solicitante${minimizado?' — '+resumoTipo:''}</div>
@@ -3625,6 +3660,7 @@ function renderPendenciaForm(s){
       <option value="">Selecione o tipo de pendência...</option>
       <option value="campo" ${tipoPend==='campo'?'selected':''}>Correção de campo</option>
       <option value="documento" ${tipoPend==='documento'?'selected':''}>Envio de documentação</option>
+      <option value="acao" ${tipoPend==='acao'?'selected':''}>Confirmação de ação (SIAGE)</option>
     </select>
     ${tipoPend==='campo'?`
     <select id="pend-campo-${s.id}" onchange="atualizarValorAtualPendencia(${s.id},this.value)" style="width:100%;margin-bottom:6px;font-size:12px;padding:5px 8px;border-radius:6px;border:1px solid #e0e0e0;font-family:system-ui,sans-serif">
@@ -3632,7 +3668,8 @@ function renderPendenciaForm(s){
       ${campoOpts}
     </select>
     ${campoAtual?`<div id="pend-valor-atual-${s.id}" style="font-size:11px;color:#92680A;margin-bottom:6px">Valor atual: ${valorAtual||'(vazio)'}</div>`:''}`:''}
-    <textarea id="pend-obs-${s.id}" placeholder="${tipoPend==='documento'?'Descreva o documento necessário (ex: quadro atualizado, novo diploma)...':'Observação (opcional)...'}" style="width:100%;min-height:50px;font-size:12px;padding:6px 8px;border-radius:6px;border:1px solid #e0e0e0;font-family:system-ui,sans-serif;margin-bottom:6px;resize:vertical">${s.pendenciaObs||''}</textarea>
+    ${tipoPend==='acao'?`<button type="button" class="btn-sm" onclick="usarTextoPadraoAcao(${s.id})" style="width:100%;margin-bottom:6px;font-size:11px">📋 Usar texto padrão (Formação Acadêmica / SIAGE)</button>`:''}
+    <textarea id="pend-obs-${s.id}" placeholder="${tipoPend==='documento'?'Descreva o documento necessário (ex: quadro atualizado, novo diploma)...':tipoPend==='acao'?'Descreva a ação que o professor precisa realizar...':'Observação (opcional)...'}" style="width:100%;min-height:50px;font-size:12px;padding:6px 8px;border-radius:6px;border:1px solid #e0e0e0;font-family:system-ui,sans-serif;margin-bottom:6px;resize:vertical">${s.pendenciaObs||''}</textarea>
     <button class="btn-sm primary" onclick="salvarPendencia(${s.id})" style="width:100%">Salvar pendência</button>
     ${s.pendenciaRespondida?'<div style="margin-top:6px;font-size:11px;color:#0F6E56;font-weight:600">✓ O solicitante já respondeu — revise e mude o status quando estiver ok.</div>':''}`}
   </div>`;
@@ -3660,7 +3697,7 @@ function salvarPendencia(id){
   const idx=solicitacoes.findIndex(s=>s.id===id);
   if(idx===-1) return;
   const tipoSel=document.getElementById('pend-tipo-'+id)?.value;
-  if(!tipoSel){ alert('Selecione o tipo de pendência (correção de campo ou envio de documentação).'); return; }
+  if(!tipoSel){ alert('Selecione o tipo de pendência.'); return; }
   if(tipoSel==='campo'){
     const campoSel=document.getElementById('pend-campo-'+id)?.value;
     if(!campoSel){ alert('Selecione o campo que precisa de correção.'); return; }
@@ -3676,7 +3713,7 @@ function salvarPendencia(id){
   atualizarDestaqueCard(id);
   const bloco=document.getElementById('pend-block-'+id);
   if(bloco) bloco.outerHTML=renderPendenciaForm(solicitacoes[idx]);
-  alert('Pendência salva. (A resposta do solicitante pela tela de acompanhamento chega na próxima etapa.)');
+  alert('Pendência salva. O solicitante já pode ver e responder isso pela tela de acompanhamento.');
 }
 
 function salvarObsComFeedback(id, btn, origem='painel'){
@@ -3883,57 +3920,4 @@ function gerarEmail(id, tipo){
   if(!box) return;
 
   box.innerHTML=`
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.75rem">
-      <span style="font-size:12px;font-weight:600;color:#666;text-transform:uppercase;letter-spacing:.05em">Documento gerado</span>
-      <div style="display:flex;gap:6px">
-        <button class="btn-sm" onclick="toggleDocBox('${boxId}')" title="Minimizar">—</button>
-        <button class="btn-sm" onclick="fecharDocBox('${boxId}')" title="Fechar">✕</button>
-      </div>
-    </div>
-    <div class="email-meta">
-      <span class="pill"><strong>Para:</strong> ${dest}</span>
-      <span class="pill"><strong>Assunto:</strong> ${assunto}</span>
-    </div>
-    <div id="${boxId}-corpo">
-      <div class="email-body">${corpo.replace(/</g,'&lt;')}</div>
-      <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
-        <button class="btn-sm" onclick="copiar(\`${corpo.replace(/`/g,'\\`')}\`)">Copiar corpo</button>
-        <button class="btn-sm" onclick="abrirMailto('${dest}','${encodeURIComponent(assunto)}','${encodeURIComponent(corpo)}')">Abrir no e-mail</button>
-      </div>
-    </div>`;
-  box.style.display='block';
-}
-
-function toggleDocBox(boxId){
-  const corpo=document.getElementById(boxId+'-corpo');
-  if(!corpo) return;
-  const minimizado=corpo.style.display==='none';
-  corpo.style.display=minimizado?'block':'none';
-  // Atualiza o botão de minimizar
-  const box=document.getElementById(boxId);
-  if(!box) return;
-  const btnMin=box.querySelector('button[title="Minimizar"]');
-  if(btnMin) btnMin.textContent=minimizado?'—':'□';
-}
-
-function fecharDocBox(boxId){
-  const box=document.getElementById(boxId);
-  if(box) box.style.display='none';
-}
-
-function copiar(txt){navigator.clipboard.writeText(txt).then(()=>{const b=event.currentTarget;b.textContent='Copiado!';setTimeout(()=>b.textContent='Copiar corpo',2000);});}
-function abrirMailto(dest,assunto,corpo){window.open('mailto:'+dest+'?subject='+assunto+'&body='+corpo);}
-
-// Aplica templates editados salvos assim que todas as funções estão prontas
-aplicarTemplatesEditados();
-
-// Carrega a lista de escolas do escolas.txt e popula os selects dos formulários públicos
-carregarListaEscolasArquivo();
-
-// Se sobrou algo pendente de uma sessão anterior (navegador fechado com fila pendente),
-// mostra o aviso na hora e já tenta reenviar, em vez de ficar em silêncio até 2min
-atualizarIndicadorSync();
-tentarReenviarFila();
-</script>
-</body>
-</html>
+    <div style="display:flex;justify-content:space-between;align-items:center;
