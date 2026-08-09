@@ -3160,6 +3160,14 @@ function agruparPorLote(sols){
   return itens;
 }
 
+let _lotesMinimizados=new Set();
+
+function toggleLoteMinimizado(protocolo){
+  if(_lotesMinimizados.has(protocolo)) _lotesMinimizados.delete(protocolo);
+  else _lotesMinimizados.add(protocolo);
+  renderCards();
+}
+
 function renderItemPainel(item){
   if(item.tipo==='individual') return renderCard(item.sol);
   const membros=[...item.membros].sort((a,b)=>(a.loteIndex||0)-(b.loteIndex||0));
@@ -3168,15 +3176,17 @@ function renderItemPainel(item){
   const totalOriginal=membros[0]?.loteTotal||totalReal;
   const avisoIncompleto=totalReal<totalOriginal
     ? `<span style="color:#A32D2D;font-weight:600"> (${totalReal} de ${totalOriginal} — algum professor pode ter sido excluído do lote)</span>` : '';
+  const minimizado=_lotesMinimizados.has(item.protocolo);
   return `<div class="lote-grupo" style="border:2px solid #185FA5;border-radius:16px;padding:1rem;margin-bottom:1rem;background:#F7FAFD">
-    <div style="display:flex;align-items:flex-start;gap:8px;margin-bottom:.875rem;flex-wrap:wrap">
+    <div style="display:flex;align-items:flex-start;gap:8px;margin-bottom:${minimizado?'0':'.875rem'};flex-wrap:wrap">
       <span style="font-size:20px;line-height:1">📦</span>
       <div style="flex:1;min-width:200px">
         <div style="font-weight:700;font-size:14px;color:#185FA5">Lote #${item.protocolo} — ${totalReal} professor(es)${avisoIncompleto}</div>
         <div style="font-size:12px;color:#666;margin-top:2px">${nomes}</div>
       </div>
+      <button type="button" class="btn-sm" onclick="toggleLoteMinimizado(${item.protocolo})" style="flex-shrink:0">${minimizado?'▾ Expandir':'▴ Minimizar'}</button>
     </div>
-    ${membros.map(m=>renderCard(m)).join('')}
+    ${minimizado?'':membros.map(m=>renderCard(m)).join('')}
   </div>`;
 }
 
@@ -3415,14 +3425,32 @@ function salvarMotivo(id,val){
 }
 
 // ── Pendência (sub-modo do status "Aguardando envio de dados") ──
+let _pendenciasMinimizadas=new Set();
+
+function togglePendenciaMinimizada(id){
+  if(_pendenciasMinimizadas.has(id)) _pendenciasMinimizadas.delete(id);
+  else _pendenciasMinimizadas.add(id);
+  const idx=solicitacoes.findIndex(s=>s.id===id);
+  if(idx===-1) return;
+  const bloco=document.getElementById('pend-block-'+id);
+  if(bloco) bloco.outerHTML=renderPendenciaForm(solicitacoes[idx]);
+}
+
 function renderPendenciaForm(s){
+  const minimizado=_pendenciasMinimizadas.has(s.id);
   const campos = CAMPOS_CORRIGIVEIS[s.tipo]||[];
   const tipoPend = s.pendenciaTipo||'';
   const campoAtual = s.pendenciaCampo||'';
   const campoOpts = campos.map(c=>`<option value="${c.key}" ${campoAtual===c.key?'selected':''}>${c.label}</option>`).join('');
   const valorAtual = campoAtual ? (s[campoAtual]??'') : '';
+  const rotuloCampo = campoAtual ? (campos.find(c=>c.key===campoAtual)?.label||campoAtual) : '';
+  const resumoTipo = tipoPend==='campo' ? ('Correção de campo'+(rotuloCampo?': '+rotuloCampo:'')) : tipoPend==='documento' ? 'Envio de documentação' : 'não definida ainda';
   return `<div id="pend-block-${s.id}" style="margin-top:8px;padding:10px;background:#FEF9EC;border:1px solid #F5D97A;border-radius:8px">
-    <div style="font-size:12px;font-weight:600;color:#92680A;margin-bottom:6px">Pendência para o solicitante</div>
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:${minimizado?'0':'6px'}">
+      <div style="font-size:12px;font-weight:600;color:#92680A">Pendência para o solicitante${minimizado?' — '+resumoTipo:''}</div>
+      <button type="button" class="btn-sm" onclick="togglePendenciaMinimizada(${s.id})" style="flex-shrink:0;padding:3px 8px;font-size:11px">${minimizado?'▾ Expandir':'▴ Minimizar'}</button>
+    </div>
+    ${minimizado?(s.pendenciaRespondida?'<div style="font-size:11px;color:#0F6E56;font-weight:600;margin-top:4px">✓ O solicitante já respondeu</div>':''):`
     <select id="pend-tipo-${s.id}" onchange="mudarTipoPendencia(${s.id},this.value)" style="width:100%;margin-bottom:6px;font-size:12px;padding:5px 8px;border-radius:6px;border:1px solid #e0e0e0;font-family:system-ui,sans-serif">
       <option value="">Selecione o tipo de pendência...</option>
       <option value="campo" ${tipoPend==='campo'?'selected':''}>Correção de campo</option>
@@ -3436,7 +3464,7 @@ function renderPendenciaForm(s){
     ${campoAtual?`<div id="pend-valor-atual-${s.id}" style="font-size:11px;color:#92680A;margin-bottom:6px">Valor atual: ${valorAtual||'(vazio)'}</div>`:''}`:''}
     <textarea id="pend-obs-${s.id}" placeholder="${tipoPend==='documento'?'Descreva o documento necessário (ex: quadro atualizado, novo diploma)...':'Observação (opcional)...'}" style="width:100%;min-height:50px;font-size:12px;padding:6px 8px;border-radius:6px;border:1px solid #e0e0e0;font-family:system-ui,sans-serif;margin-bottom:6px;resize:vertical">${s.pendenciaObs||''}</textarea>
     <button class="btn-sm primary" onclick="salvarPendencia(${s.id})" style="width:100%">Salvar pendência</button>
-    ${s.pendenciaRespondida?'<div style="margin-top:6px;font-size:11px;color:#0F6E56;font-weight:600">✓ O solicitante já respondeu — revise e mude o status quando estiver ok.</div>':''}
+    ${s.pendenciaRespondida?'<div style="margin-top:6px;font-size:11px;color:#0F6E56;font-weight:600">✓ O solicitante já respondeu — revise e mude o status quando estiver ok.</div>':''}`}
   </div>`;
 }
 
