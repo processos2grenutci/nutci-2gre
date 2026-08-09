@@ -302,8 +302,8 @@ body{font-family:system-ui,sans-serif;font-size:14px;color:#1a1a1a;background:#f
       <div class="sec-title">Quem está preenchendo?</div>
       <div class="field">
         <div class="radio-group" id="rg-quem">
-          <label class="ropt" onclick="selR('quem','professor',this)"><input type="radio">O próprio professor</label>
-          <label class="ropt" onclick="selR('quem','gestor',this)"><input type="radio">Gestor escolar (pelo professor)</label>
+          <label class="ropt" onclick="selR('quem','professor',this)"><input type="radio">Professor(a)</label>
+          <label class="ropt" onclick="selR('quem','gestor',this)"><input type="radio">Gestão Escolar</label>
         </div>
       </div>
     </div>
@@ -581,7 +581,7 @@ body{font-family:system-ui,sans-serif;font-size:14px;color:#1a1a1a;background:#f
     <div class="field">
       <label>CPF, matrícula ou protocolo do lote</label>
       <input type="text" id="consulta-input"
-        placeholder="CPF, matrícula ou protocolo (ex: 1786048776993)"
+        placeholder="CPF, matrícula ou protocolo (ex: LT-63766979)"
         oninput="if(this.value.replace(/\D/g,'').length<=11&&!isNaN(this.value.replace(/[\.\-]/g,''))) mascaraCPFConsulta(this)"
         onkeydown="if(event.key==='Enter') buscarSolicitacao()"/>
     </div>
@@ -753,6 +753,15 @@ function toggleContatosUteis(){
 }
 
 const SHEETS_URL='https://script.google.com/macros/s/AKfycbz_kCQt1bsOChFImeZD4cZ7XlN7_DG-swBnO_G0FJP5PyrHyl0G-Yj906ZTtvoA9Hw/exec';
+
+// Formata o protocolo exibido pro usuário — usa o id interno (já garantidamente
+// único, gerado via Date.now()) com um prefixo que identifica o tipo, mostrando só
+// os últimos 8 dígitos (mais fácil de ler/copiar do que o número interno inteiro).
+function formatarProtocolo(tipo, id){
+  const prefixo = tipo==='acesso' ? 'AC' : 'LT';
+  const digitos = String(id).slice(-8);
+  return prefixo+'-'+digitos;
+}
 
 // ══════════════════════════════════════════════
 //  LINKS IMPORTANTES (tela inicial)
@@ -2357,7 +2366,7 @@ function mostrarConclusaoLote(loteProtocolo, resultados){
   document.getElementById('form-lotacao').classList.add('hidden');
   document.getElementById('conclusao-titulo').textContent='Lote de lotação enviado com sucesso!';
   document.getElementById('conclusao-msg').innerHTML='Foram registradas '+resultados.length+' solicitações de lotação, vinculadas ao mesmo protocolo:<br>'+resultados.map(r=>'• '+r.prof).join('<br>');
-  document.getElementById('conclusao-protocolo-num').textContent='#'+loteProtocolo;
+  document.getElementById('conclusao-protocolo-num').textContent=formatarProtocolo('lotacao', loteProtocolo);
   const btnNova=document.getElementById('btn-nova-sol');
   if(btnNova){ btnNova.textContent='Nova solicitação de lotação'; btnNova.dataset.tipo='lotacao'; }
   resetLoteDOM();
@@ -2438,7 +2447,7 @@ function mostrarConclusao(tipo, solId){
 
   document.getElementById('conclusao-titulo').textContent=titulos[tipo]||'Solicitação enviada com sucesso!';
   document.getElementById('conclusao-msg').textContent=msgs[tipo]||'';
-  document.getElementById('conclusao-protocolo-num').textContent='#'+solId;
+  document.getElementById('conclusao-protocolo-num').textContent=formatarProtocolo(tipo, solId);
 
   const btnNova=document.getElementById('btn-nova-sol');
   btnNova.textContent=labels[tipo]||'Nova solicitação';
@@ -2826,7 +2835,7 @@ async function buscarSolicitacao(){
   const cabecalhoLote=ehLote?`<div style="background:#EBF3FB;border:1px solid #b5d4f4;border-radius:12px;padding:1rem;margin:.875rem 0;display:flex;align-items:center;gap:10px">
     <span style="font-size:24px">📦</span>
     <div>
-      <div style="font-weight:700;font-size:14px;color:#185FA5">Lote #${protocolosUnicos[0]} — ${encontradas.length} professor(es)</div>
+      <div style="font-weight:700;font-size:14px;color:#185FA5">Lote ${formatarProtocolo('lotacao',protocolosUnicos[0])} — ${encontradas.length} professor(es)</div>
       <div style="font-size:12px;color:#666">${encontradas.map(s=>s.nome).join(', ')}</div>
     </div>
   </div>`:'';
@@ -3315,7 +3324,7 @@ function renderItemPainel(item){
     <div style="display:flex;align-items:flex-start;gap:8px;margin-bottom:${minimizado?'0':'.875rem'};flex-wrap:wrap">
       <span style="font-size:20px;line-height:1">📦</span>
       <div style="flex:1;min-width:200px">
-        <div style="font-weight:700;font-size:14px;color:#185FA5">Lote #${item.protocolo} — ${totalReal} professor(es)${avisoIncompleto}</div>
+        <div style="font-weight:700;font-size:14px;color:#185FA5">Lote ${formatarProtocolo('lotacao',item.protocolo)} — ${totalReal} professor(es)${avisoIncompleto}</div>
         <div style="font-size:12px;color:#666;margin-top:2px">${nomes}</div>
       </div>
       <button type="button" class="btn-sm" onclick="toggleLoteMinimizado(${item.protocolo})" style="flex-shrink:0">${minimizado?'▾ Expandir':'▴ Minimizar'}</button>
@@ -3397,7 +3406,7 @@ function renderCard(s){
           ${statusBadge(s.status)}
         </div>
         <div class="card-title">${nome}</div>
-        <div class="card-sub">${s.escola||''} · ${s.data}${s.loteProtocolo?` · <span style="color:#185FA5;font-weight:500">📦 Lote #${s.loteProtocolo} (${s.loteIndex||'?'}/${s.loteTotal||'?'})</span>`:''}</div>
+        <div class="card-sub">${s.escola||''} · ${s.data}${s.loteProtocolo?` · <span style="color:#185FA5;font-weight:500">📦 Lote ${formatarProtocolo('lotacao',s.loteProtocolo)} (${s.loteIndex||'?'}/${s.loteTotal||'?'})</span>`:''}</div>
       </div>
       <button type="button" class="btn-sm" onclick="toggleCardExpandido(${s.id})" style="flex-shrink:0">${expandido?'▴ Recolher':'▾ Detalhes'}</button>
     </div>`;
