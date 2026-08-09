@@ -2956,7 +2956,7 @@ function renderCards(){
       if(!nome.includes(busca)&&!mat.includes(busca)&&!escola.includes(busca)) return false;
     }
     return true;
-  });
+  }).sort((a,b)=>b.id-a.id); // mais recente primeiro — sem isso, a ordem dependia de como a lista já estava montada
   atualizarControlesFiltroPainel();
   if(sols.length===0){
     list.innerHTML=`<div class="empty">${_mostrarOcultosPainel?'Nenhum card ocultado no momento.':'Nenhuma solicitação encontrada.'}</div>`;
