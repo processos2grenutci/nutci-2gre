@@ -72,6 +72,7 @@ body{font-family:system-ui,sans-serif;font-size:14px;color:#1a1a1a;background:#f
 .data-item .dv{color:#1a1a1a;font-weight:500}
 .card-actions{display:flex;flex-wrap:wrap;gap:6px;border-top:1px solid #e0e0e0;padding-top:.75rem}
 .btn-sm{padding:5px 12px;border:1px solid #e0e0e0;border-radius:8px;background:#fff;font-size:12px;cursor:pointer;font-family:system-ui,sans-serif;color:#666}
+.btn-sm.active-filtro{background:#185FA5;border-color:#185FA5;color:#fff}
 .btn-sm:hover{background:#f5f5f3}
 .btn-sm.primary{background:#185FA5;color:#fff;border-color:#185FA5}
 .btn-sm.primary:hover{background:#0C447C}
@@ -278,10 +279,11 @@ body{font-family:system-ui,sans-serif;font-size:14px;color:#1a1a1a;background:#f
       </div>
       <div class="field">
         <label>Escola<span class="req">*</span></label>
-        <input type="text" id="ac-escola" placeholder="Nome da escola"
-          oninput="validarCampo(this,'nome');atualizarProgressoAcesso()"
-          onblur="validarCampo(this,'nome')"/>
-        <div class="field-error" id="err-ac-escola">Informe o nome da escola.</div>
+        <select id="ac-escola"
+          onchange="validarCampo(this,'select');atualizarProgressoAcesso()">
+          <option value="">Selecione a escola...</option>
+        </select>
+        <div class="field-error" id="err-ac-escola">Selecione a escola.</div>
       </div>
     </div>
     <div class="sec">
@@ -332,7 +334,7 @@ body{font-family:system-ui,sans-serif;font-size:14px;color:#1a1a1a;background:#f
         </div>
       </div>
     </div>
-    <button class="btn-primary" onclick="enviarAcesso()">Enviar solicitação</button>
+    <button class="btn-primary" id="btn-enviar-ac" onclick="enviarAcesso()">Enviar solicitação</button>
   </div>
 
   <!-- FORM LOTACAO -->
@@ -401,10 +403,11 @@ body{font-family:system-ui,sans-serif;font-size:14px;color:#1a1a1a;background:#f
       </div>
       <div class="field">
         <label>Escola de lotação (maior carga horária)<span class="req">*</span></label>
-        <input type="text" id="lot-escola" placeholder="Nome da escola"
-          oninput="validarCampo(this,'nome');atualizarProgressoLotacao()"
-          onblur="validarCampo(this,'nome')"/>
-        <div class="field-error" id="err-lot-escola">Informe a escola de lotação.</div>
+        <select id="lot-escola"
+          onchange="validarCampo(this,'select');atualizarProgressoLotacao()">
+          <option value="">Selecione a escola...</option>
+        </select>
+        <div class="field-error" id="err-lot-escola">Selecione a escola de lotação.</div>
       </div>
     </div>
     <div class="sec">
@@ -452,10 +455,11 @@ body{font-family:system-ui,sans-serif;font-size:14px;color:#1a1a1a;background:#f
       </div>
       <div class="field hidden" id="campo-comp">
         <label>Escola de complementação<span class="req">*</span></label>
-        <input type="text" id="lot-escola-comp" placeholder="Nome da escola de complementação"
-          oninput="validarCampo(this,'nome');atualizarProgressoLotacao()"
-          onblur="validarCampo(this,'nome')"/>
-        <div class="field-error" id="err-lot-escola-comp">Informe a escola de complementação.</div>
+        <select id="lot-escola-comp"
+          onchange="validarCampo(this,'select');atualizarProgressoLotacao()">
+          <option value="">Selecione a escola...</option>
+        </select>
+        <div class="field-error" id="err-lot-escola-comp">Selecione a escola de complementação.</div>
       </div>
       <div class="field">
         <label>Se afastou com licença nos últimos 6 meses?<span class="req">*</span></label>
@@ -480,10 +484,11 @@ body{font-family:system-ui,sans-serif;font-size:14px;color:#1a1a1a;background:#f
       <div class="field hidden" id="campo-oficio">
         <div class="field" style="margin-bottom:.75rem">
           <label>Escola de origem (escola anterior)<span class="req">*</span></label>
-          <input type="text" id="lot-escola-origem" placeholder="Nome da escola de onde o professor saiu"
-            oninput="validarCampo(this,'nome');atualizarProgressoLotacao()"
-            onblur="validarCampo(this,'nome')" required/>
-          <div class="field-error" id="err-lot-escola-origem">Informe a escola de origem.</div>
+          <select id="lot-escola-origem"
+            onchange="validarCampo(this,'select');atualizarProgressoLotacao()" required>
+            <option value="">Selecione a escola...</option>
+          </select>
+          <div class="field-error" id="err-lot-escola-origem">Selecione a escola de origem.</div>
         </div>
         <div style="background:#FEF9EC;border:1px solid #F5D97A;border-radius:8px;padding:10px 13px;font-size:13px;color:#7a5c10;line-height:1.6">
           ⚠️ Para que sua lotação seja realizada, o processo de remoção precisa ter sido comunicado ao SGMOP com os documentos necessários. Caso não tenha certeza se isso foi feito, não se preocupe — o NUTCI verificará e entrará em contato se necessário.
@@ -645,8 +650,10 @@ body{font-family:system-ui,sans-serif;font-size:14px;color:#1a1a1a;background:#f
     </div>
   </div>
   <div class="filter-bar">
-    <input type="text" id="painel-busca" placeholder="Buscar por nome ou matrícula..." oninput="renderCards()"
+    <input type="text" id="painel-busca" placeholder="Buscar por nome ou matrícula..."
+      onkeydown="if(event.key==='Enter') buscarPainel()"
       style="flex:1;min-width:180px;font-family:system-ui,sans-serif;font-size:13px;padding:7px 12px;border:1px solid #e0e0e0;border-radius:20px;outline:none"/>
+    <button class="btn-sm" onclick="buscarPainel()">🔍 Buscar</button>
     <select id="fil-tipo" onchange="sincronizarFiltroStatus();renderCards()">
       <option value="">Todos os tipos</option>
       <option value="acesso">Acesso / E-mail</option>
@@ -655,6 +662,11 @@ body{font-family:system-ui,sans-serif;font-size:14px;color:#1a1a1a;background:#f
     <select id="fil-status" onchange="renderCards()">
       <option value="">Todos os status</option>
     </select>
+    <select id="fil-escola" onchange="renderCards()">
+      <option value="">Todas as escolas</option>
+    </select>
+    <button class="btn-sm" id="btn-filtro-aguardando" onclick="toggleFiltroAguardandoPainel()">🔴 Aguardando ação</button>
+    <button class="btn-sm" id="btn-toggle-ocultos" onclick="toggleMostrarOcultosPainel()">🙈 Mostrar ocultados</button>
     <button class="btn-sm" onclick="limparFiltrosPainel()">Limpar filtros</button>
   </div>
   <div id="cards-list"></div>
@@ -689,6 +701,12 @@ body{font-family:system-ui,sans-serif;font-size:14px;color:#1a1a1a;background:#f
     <button class="btn-sm danger" onclick="removerSenha()" style="width:100%;padding:8px;margin-top:6px">Remover senha (desbloqueia painel para todos)</button>
   </div>
   <div class="config-sec">
+    <div style="font-size:15px;font-weight:500;color:#1a1a1a;margin-bottom:.75rem">Armazenamento local deste navegador</div>
+    <p style="font-size:13px;color:#666;margin-bottom:.875rem;line-height:1.6">O sistema guarda uma cópia local das solicitações neste navegador (pra abrir mais rápido e funcionar offline). Com o tempo, isso pode encher o limite de armazenamento do navegador e travar o salvamento de alterações. Isso <strong>não afeta a planilha real</strong> — só o cache deste computador.</p>
+    <div id="cache-local-status" style="font-size:12px;color:#666;margin-bottom:8px">Calculando uso...</div>
+    <button class="btn-sm danger" onclick="limparCacheLocal()" style="width:100%;padding:8px">Limpar cache local deste navegador</button>
+  </div>
+  <div class="config-sec">
     <div id="config-status-box"></div>
     <p style="font-size:13px;color:#666;line-height:1.6">Os arquivos enviados pelos professores são armazenados no <strong>Cloudinary</strong>. Nenhuma configuração adicional é necessária.</p>
   </div>
@@ -716,18 +734,121 @@ let arquivosSelecionados=[];
 // ══════════════════════════════════════════════
 //  INTEGRAÇÃO COM GOOGLE SHEETS
 // ══════════════════════════════════════════════
-const SHEETS_URL='https://script.google.com/macros/s/AKfycbzKS5p9ARVNjqDaM5zr2UyTV8vlyeyVVefFpM_uAhFLn6CYvIpwVaXitj6veVRAnNQe/exec';
+const SHEETS_URL='https://script.google.com/macros/s/AKfycbz_kCQt1bsOChFImeZD4cZ7XlN7_DG-swBnO_G0FJP5PyrHyl0G-Yj906ZTtvoA9Hw/exec';
 
-async function enviarParaSheets(sol){
+// Grava no localStorage sem nunca travar quem chamou — o cache local é só um
+// atalho/fallback; se a cota do navegador estourar, isso NUNCA pode impedir
+// a sincronização de verdade com o servidor (que é o que realmente importa).
+function salvarLocalSeguro(chave, valor){
   try{
-    await fetch(SHEETS_URL,{
-      method:'POST',
-      headers:{'Content-Type':'text/plain'},
-      body:JSON.stringify(sol)
-    });
+    localStorage.setItem(chave, valor);
+    return true;
   }catch(e){
-    console.warn('Erro ao enviar para Sheets:',e.message);
+    console.warn('[storage] Não foi possível salvar localmente ('+chave+'):', e.message);
+    return false;
   }
+}
+
+// Guarda só as solicitações mais recentes no cache local (não o histórico inteiro),
+// pra não estourar a cota do navegador conforme o histórico cresce com o tempo.
+// A lista completa continua vindo da planilha normalmente — isso é só o cache rápido.
+const LIMITE_CACHE_LOCAL=300;
+function salvarSolicitacoesLocal(){
+  const paraCache = solicitacoes.length>LIMITE_CACHE_LOCAL ? solicitacoes.slice(0,LIMITE_CACHE_LOCAL) : solicitacoes;
+  salvarLocalSeguro('nutci_sols', JSON.stringify(paraCache));
+}
+
+function calcularUsoCacheLocal(){
+  const el=document.getElementById('cache-local-status');
+  if(!el) return;
+  try{
+    let totalBytes=0;
+    for(let i=0;i<localStorage.length;i++){
+      const k=localStorage.key(i);
+      const v=localStorage.getItem(k)||'';
+      totalBytes+=(k.length+v.length)*2; // aproximado, UTF-16
+    }
+    const kb=(totalBytes/1024).toFixed(0);
+    const filaAtual=JSON.parse(localStorage.getItem('nutci_fila')||'[]');
+    let txt='Uso aproximado neste navegador: '+kb+' KB';
+    if(filaAtual.length>0) txt+=' · ⚠ '+filaAtual.length+' atualização(ões) ainda pendente(s) de sincronizar';
+    el.textContent=txt;
+  }catch(e){
+    el.textContent='Não foi possível calcular o uso local.';
+  }
+}
+
+function limparCacheLocal(){
+  let filaAtual=[];
+  try{ filaAtual=JSON.parse(localStorage.getItem('nutci_fila')||'[]'); }catch(e){}
+  let msg='Isso apaga a cópia local das solicitações neste navegador (não afeta a planilha real). Confirmar?';
+  if(filaAtual.length>0){
+    msg='⚠ Existem '+filaAtual.length+' atualização(ões) deste navegador ainda pendente(s) de sincronizar com o servidor. Limpar agora pode perder essas alterações se elas ainda não tiverem sido confirmadas. Quer mesmo limpar?';
+  }
+  if(!confirm(msg)) return;
+  ['nutci_sols','nutci_fila'].forEach(k=>{ try{ localStorage.removeItem(k); }catch(e){} });
+  alert('Cache local limpo. A página vai recarregar.');
+  location.reload();
+}
+
+// ══════════════════════════════════════════════
+//  LISTA DE ESCOLAS (fonte única: escolas.txt, junto do index.html)
+//  Alimenta os selects de escola dos formulários públicos.
+//  Pra adicionar/remover escola, edite só o escolas.txt — não precisa mexer no código.
+// ══════════════════════════════════════════════
+let ESCOLAS_2GRE=[];
+const IDS_SELECT_ESCOLA=['ac-escola','lot-escola','lot-escola-comp','lot-escola-origem'];
+
+async function carregarListaEscolasArquivo(){
+  try{
+    const resp=await fetch('escolas.txt');
+    if(!resp.ok) throw new Error('HTTP '+resp.status);
+    const texto=await resp.text();
+    ESCOLAS_2GRE=texto.split('\n').map(l=>l.trim()).filter(Boolean);
+    ESCOLAS_2GRE.sort((a,b)=>a.localeCompare(b,'pt-BR'));
+    popularSelectsEscolaFormularios();
+    sincronizarFiltroEscola();
+    sincronizarFiltroEscolaGeral();
+  }catch(e){
+    console.warn('Erro ao carregar escolas.txt:',e.message);
+    IDS_SELECT_ESCOLA.forEach(id=>{
+      const sel=document.getElementById(id);
+      if(sel) sel.innerHTML='<option value="">Erro ao carregar lista de escolas — recarregue a página</option>';
+    });
+  }
+}
+
+function popularSelectsEscolaFormularios(){
+  IDS_SELECT_ESCOLA.forEach(id=>{
+    const sel=document.getElementById(id);
+    if(!sel) return;
+    const atual=sel.value;
+    sel.innerHTML='<option value="">Selecione a escola...</option>'+
+      ESCOLAS_2GRE.map(e=>`<option value="${e.replace(/"/g,'&quot;')}">${e}</option>`).join('');
+    if(atual) sel.value=atual;
+  });
+}
+
+async function enviarParaSheets(sol, tentativas=2){
+  for(let i=0;i<tentativas;i++){
+    try{
+      const controller=new AbortController();
+      const timeout=setTimeout(()=>controller.abort(), 15000); // timeout de 15s por tentativa
+      const resp=await fetch(SHEETS_URL,{
+        method:'POST',
+        headers:{'Content-Type':'text/plain'},
+        body:JSON.stringify(sol),
+        signal:controller.signal
+      });
+      clearTimeout(timeout);
+      const data=await resp.json().catch(()=>null);
+      if(data && data.ok) return true; // só considera sucesso se o servidor confirmou de verdade
+    }catch(e){
+      console.warn('Tentativa '+(i+1)+' de enviar para Sheets falhou:', e.message);
+    }
+    if(i<tentativas-1) await new Promise(r=>setTimeout(r,1500)); // pequena pausa antes de tentar de novo
+  }
+  return false; // todas as tentativas falharam — quem chamou precisa avisar o usuário
 }
 
 const CACHE_TTL = 2 * 60 * 1000; // 2 minutos em ms
@@ -737,11 +858,11 @@ async function carregarDoSheets(forcar=false){
   const agora=Date.now();
   // Usa cache se não forçar e ainda estiver válido
   if(!forcar && (agora - _ultimoCarregamento) < CACHE_TTL){
-    return;
+    return true;
   }
   try{
     const controller=new AbortController();
-    const timeout=setTimeout(()=>controller.abort(), 8000); // timeout de 8s
+    const timeout=setTimeout(()=>controller.abort(), 20000); // timeout de 20s (margem maior — evita falso "sumiço" se o backend demorar)
     const [r1,r2]=await Promise.all([
       fetch(SHEETS_URL+'?tipo=acesso', {signal:controller.signal}),
       fetch(SHEETS_URL+'?tipo=lotacao', {signal:controller.signal})
@@ -753,15 +874,49 @@ async function carregarDoSheets(forcar=false){
     const todas=[...acesso,...lotacao].sort((a,b)=>b.id-a.id);
     if(todas.length>0){
       solicitacoes=todas;
-      localStorage.setItem('nutci_sols',JSON.stringify(solicitacoes));
+      // Reaplica por cima qualquer edição local ainda pendente de sincronizar (fila),
+      // pra não "reverter" visualmente uma mudança que ainda está a caminho do servidor
+      _filaPendente.forEach(pendente=>{
+        const idx=solicitacoes.findIndex(s=>s.id===pendente.id);
+        if(idx!==-1) solicitacoes[idx]=pendente;
+        else solicitacoes.unshift(pendente);
+      });
+      salvarSolicitacoesLocal();
       _ultimoCarregamento=Date.now(); // atualiza timestamp do cache
     }
+    return true;
   }catch(e){
-    // Falha silenciosa — usa dados do localStorage como fallback
-    // Só loga se não for abort/timeout
+    // Falha real (timeout ou rede) — não mexe em solicitacoes (mantém cache local se houver)
     if(e.name!=='AbortError'){
-      console.info('Sheets indisponível, usando dados locais.');
+      console.warn('Sheets indisponível, usando dados locais:', e.message);
+    }else{
+      console.warn('Tempo esgotado ao carregar do Sheets (20s), usando dados locais.');
     }
+    return false;
+  }
+}
+
+function mostrarErroCarregamento(containerId, pagina){
+  const container=document.getElementById(containerId);
+  if(!container) return;
+  container.innerHTML=`<div class="empty">⚠ Não foi possível carregar as solicitações agora — o servidor demorou pra responder.<br>
+    Os dados <strong>não foram perdidos</strong>, continuam salvos na planilha.<br><br>
+    <button class="btn-sm primary" onclick="tentarRecarregar('${pagina}')">🔄 Tentar novamente</button></div>`;
+}
+
+async function tentarRecarregar(pagina){
+  if(pagina==='geral'){
+    mostrarLoadingGeral(true);
+    const ok=await carregarDoSheets(true);
+    mostrarLoadingGeral(false);
+    if(!ok && solicitacoes.length===0){ mostrarErroCarregamento('geral-tabela','geral'); }
+    else { renderGeral(); }
+  }else{
+    mostrarLoadingPainel(true);
+    const ok=await carregarDoSheets(true);
+    mostrarLoadingPainel(false);
+    if(!ok && solicitacoes.length===0){ mostrarErroCarregamento('cards-list','painel'); }
+    else { sincronizarFiltroStatus(); renderCards(); }
   }
 }
 
@@ -990,7 +1145,7 @@ function salvarSenha(){
     errEl.textContent='As senhas não coincidem.';
     errEl.style.display='block'; return;
   }
-  localStorage.setItem('nutci_senha', hashSenha(nova));
+  salvarLocalSeguro('nutci_senha', hashSenha(nova));
   document.getElementById('cfg-senha-nova').value='';
   document.getElementById('cfg-senha-conf').value='';
   okEl.style.display='block';
@@ -1006,6 +1161,35 @@ function removerSenha(){
   showPage('publico', btn);
   alert('Senha removida. O painel está desbloqueado.');
 }
+
+// ══════════════════════════════════════════════
+//  ÁREA DA ESCOLA
+// ══════════════════════════════════════════════
+
+
+
+
+
+
+
+// ══════════════════════════════════════════════
+//  ÁREA DA ESCOLA — PÉ-DE-MEIA
+// ══════════════════════════════════════════════
+
+
+
+
+
+
+
+
+
+
+// Acha o mês mais recente que tem pelo menos um valor lançado, varrendo de DEZ pra FEV
+
+// Extrai um número válido de uma célula, ou null se estiver vazia/sem lançamento
+
+
 
 // Atalho de teclado: Ctrl + Shift + A
 document.addEventListener('keydown', function(e){
@@ -1097,7 +1281,7 @@ const PASSOS_ACESSO=[
   {id:'ac-cpf',      label:'CPF',                  tipo:'cpf'},
   {id:'ac-nasc',     label:'Nascimento',            tipo:'text'},
   {id:'ac-funcao',   label:'Função',               tipo:'select'},
-  {id:'ac-escola',   label:'Escola',               tipo:'text'},
+  {id:'ac-escola',   label:'Escola',               tipo:'select'},
   {id:'ac-wpp',      label:'WhatsApp',             tipo:'tel'},
   {id:'ac-email-pes',label:'E-mail pessoal',       tipo:'email'},
   {id:'ecit',        label:'ECIT',                 tipo:'radio'},
@@ -1137,7 +1321,7 @@ const PASSOS_LOTACAO=[
   {id:'lot-mat',     label:'Matrícula',        tipo:'text'},
   {id:'lot-wpp',     label:'WhatsApp',         tipo:'tel'},
   {id:'lot-email',   label:'E-mail',           tipo:'email'},
-  {id:'lot-escola',  label:'Escola',           tipo:'text'},
+  {id:'lot-escola',  label:'Escola',           tipo:'select'},
   {id:'siage',       label:'SIAGE',            tipo:'radio'},
   {id:'comp',        label:'Complementação',   tipo:'radio'},
   {id:'lic',         label:'Licença',          tipo:'radio'},
@@ -1149,7 +1333,7 @@ function atualizarProgressoLotacao(){
   let passos=[...PASSOS_LOTACAO];
   if(radios['comp']==='sim'){
     const jatem=passos.find(p=>p.id==='lot-escola-comp');
-    if(!jatem) passos.push({id:'lot-escola-comp',label:'Escola comp.',tipo:'text'});
+    if(!jatem) passos.push({id:'lot-escola-comp',label:'Escola comp.',tipo:'select'});
   }
   // Inclui documentos
   passos.push({id:'__docs__',label:'Documentos',tipo:'docs'});
@@ -1181,15 +1365,21 @@ function atualizarProgressoLotacao(){
 function getNome(s){return s.tipo==='lotacao'?s.prof:s.nome;}
 function getEscola(s){return s.escola||'—';}
 
+function sincronizarFiltroEscolaGeral(){
+  const sel=document.getElementById('geral-fil-escola');
+  if(!sel) return;
+  const anterior=sel.value;
+  sel.innerHTML='<option value="">Todas as escolas</option>'+
+    ESCOLAS_2GRE.map(e=>`<option value="${e.replace(/"/g,'&quot;')}">${e}</option>`).join('');
+  if(anterior && ESCOLAS_2GRE.includes(anterior)) sel.value=anterior;
+}
+
 function renderGeral(){
   const busca=(document.getElementById('geral-busca').value||'').toLowerCase();
   const filTipo=document.getElementById('geral-fil-tipo').value;
   const filStatus=document.getElementById('geral-fil-status').value;
+  sincronizarFiltroEscolaGeral();
   const filEscola=document.getElementById('geral-fil-escola').value;
-  const escolas=[...new Set(solicitacoes.map(s=>getEscola(s)).filter(e=>e&&e!=='—'))].sort();
-  const escolaSel=document.getElementById('geral-fil-escola');
-  const cur=escolaSel.value;
-  escolaSel.innerHTML='<option value="">Todas as escolas</option>'+escolas.map(e=>`<option ${e===cur?'selected':''}>${e}</option>`).join('');
   let sols=[...solicitacoes].sort((a,b)=>b.id-a.id);
   if(busca) sols=sols.filter(s=>getNome(s).toLowerCase().includes(busca)||getEscola(s).toLowerCase().includes(busca));
   if(filTipo) sols=sols.filter(s=>s.tipo===filTipo);
@@ -1213,7 +1403,57 @@ function renderResumo(sols){
 
 const STATUS_INICIAL=['Pendente','Pendente (aguardando interação)','Aguardando','Aguardando dados completos','Aguardando envio completo de dados'];
 
-function semAcao(s){ return STATUS_INICIAL.includes(s.status); }
+// "Aguardando ação" só deve valer pra card que NUNCA sofreu nenhuma interação do admin:
+// - se algum campo já foi tocado (status alterado deliberadamente, obs, motivo) OU
+// - se o card já foi marcado explicitamente (acaoRealizada, setado por qualquer ação nova daqui pra frente)
+// então o card sai da condição "aguardando ação".
+function semAcao(s){
+  if(s.acaoRealizada) return false;
+  const semObs=!s.obs||!String(s.obs).trim();
+  const semMotivo=!s.motivoNegado||!String(s.motivoNegado).trim();
+  return STATUS_INICIAL.includes(s.status) && semObs && semMotivo;
+}
+
+// Calcula o destaque visual do card: aguardando ação (amarelo) ou resolvido (verde). Nunca os dois ao mesmo tempo.
+function calcularDestaqueCard(s){
+  if(semAcao(s)) return {tipo:'aguardando', border:'#F5D97A', bg:'#FFFBF0'};
+  if(s.status==='Resolvido') return {tipo:'resolvido', border:'#6FCF97', bg:'#F1FBF6'};
+  return {tipo:'normal', border:null, bg:null};
+}
+
+// Atualiza só o destaque de um card específico já renderizado (sem re-render completo,
+// pra não perder foco/estado de textarea, dropdown, etc.)
+function atualizarDestaqueCard(id){
+  const s=solicitacoes.find(x=>x.id===id);
+  if(!s) return;
+  const cardEl=document.getElementById('card-'+id);
+  if(!cardEl) return; // card não está na tela agora (ex: em outra página) — nada a fazer
+  const d=calcularDestaqueCard(s);
+  cardEl.style.borderLeft=d.border?('3px solid '+d.border):'';
+  cardEl.style.background=d.bg||'';
+  const badgesRow=document.getElementById('card-badges-'+id);
+  if(badgesRow){
+    let aguardEl=badgesRow.querySelector('.badge-aguardando-acao');
+    if(d.tipo==='aguardando'){
+      if(!aguardEl){
+        badgesRow.insertAdjacentHTML('afterbegin','<span class="badge-aguardando-acao" style="font-size:12px;font-weight:600;color:#92680A;background:#FEF9EC;border:1px solid #F5D97A;padding:2px 8px;border-radius:20px">🔴 Aguardando ação</span>');
+      }
+    } else if(aguardEl){
+      aguardEl.remove();
+    }
+  }
+}
+
+// Marca o card como "com interação" (qualquer ação que não seja mudar status/obs/motivo,
+// ex: gerar e-mail/ofício) e sincroniza + atualiza o destaque.
+function marcarAcaoRealizada(id){
+  const idx=solicitacoes.findIndex(x=>x.id===id);
+  if(idx===-1) return;
+  if(solicitacoes[idx].acaoRealizada) return; // já estava marcado, evita sync redundante
+  solicitacoes[idx].acaoRealizada=true;
+  sincronizarAtualizacao(solicitacoes[idx]);
+  atualizarDestaqueCard(id);
+}
 
 let _ordemCol='data';
 let _ordemDir='desc';
@@ -1416,19 +1656,20 @@ async function showPage(p,btn){
   btn.classList.add('active');
   if(p==='geral'){
     mostrarLoadingGeral(true);
-    await carregarDoSheets();
+    const ok=await carregarDoSheets();
     mostrarLoadingGeral(false);
-    renderGeral();
+    if(!ok && solicitacoes.length===0){ mostrarErroCarregamento('geral-tabela','geral'); }
+    else { renderGeral(); }
     marcarComoVisto();
   }
   if(p==='painel'){
     mostrarLoadingPainel(true);
-    await carregarDoSheets();
+    const ok=await carregarDoSheets();
     mostrarLoadingPainel(false);
-    sincronizarFiltroStatus();
-    renderCards();
+    if(!ok && solicitacoes.length===0){ mostrarErroCarregamento('cards-list','painel'); }
+    else { sincronizarFiltroStatus(); renderCards(); }
   }
-  if(p==='config'){renderConfigStatus();renderBloqueioStatus();renderEditorTemplates();}
+  if(p==='config'){renderConfigStatus();renderBloqueioStatus();renderEditorTemplates();calcularUsoCacheLocal();}
   if(p==='consulta'){
     document.getElementById('consulta-input').value='';
     document.getElementById('consulta-resultado').innerHTML='';
@@ -1601,7 +1842,7 @@ function salvarTpl(chave){
   if(assunto !== undefined) tplSalvo.assunto = assunto;
   tplSalvo.corpo = corpo;
 
-  localStorage.setItem('nutci_tpl_'+chave, JSON.stringify(tplSalvo));
+  salvarLocalSeguro('nutci_tpl_'+chave, JSON.stringify(tplSalvo));
   errEl.style.display='none';
   okEl.style.display='block';
   setTimeout(()=>{ okEl.style.display='none'; renderEditorTemplates(); }, 1500);
@@ -1648,6 +1889,8 @@ function renderConfigStatus(){
   box.className='config-status ok';
   box.innerHTML='Upload de arquivos integrado com o Cloudinary e ativo.';
 }
+
+
 
 async function atualizarPainel(tipo){
   const btnId=tipo==='geral'?'btn-atualizar-geral':'btn-atualizar-painel';
@@ -1940,7 +2183,7 @@ async function fazerUpload(){
 // ══════════════════════════════════════════════
 //  ENVIO DOS FORMULÁRIOS
 // ══════════════════════════════════════════════
-function enviarAcesso(){
+async function enviarAcesso(){
   if(recebimentoBloqueado()){
     alert('O recebimento de solicitações está temporariamente suspenso. Tente novamente mais tarde ou entre em contato com o NUTCI pelo WhatsApp.');
     return;
@@ -1952,7 +2195,7 @@ function enviarAcesso(){
     {el:document.getElementById('ac-cpf'),    tipo:'cpf'},
     {el:document.getElementById('ac-nasc'),   tipo:'data'},
     {el:document.getElementById('ac-funcao'), tipo:'select'},
-    {el:document.getElementById('ac-escola'), tipo:'nome'},
+    {el:document.getElementById('ac-escola'), tipo:'select'},
     {el:document.getElementById('ac-wpp'),    tipo:'tel'},
     {el:document.getElementById('ac-email-pes'),tipo:'email'},
   ];
@@ -1970,9 +2213,16 @@ function enviarAcesso(){
     nome:v('ac-nome'),mat:v('ac-mat'),cpf:v('ac-cpf'),nasc:v('ac-nasc'),
     funcao:v('ac-funcao'),escola:v('ac-escola'),emailInst:v('ac-email-inst'),
     wpp:v('ac-wpp'),emailPes:v('ac-email-pes'),ecit:radios['ecit'],licenca:radios['licenca-ac'],obs:''};
-  salvarSol(sol);
-  mostrarConclusao('acesso', sol.id);
-  resetForm();
+  const btn=document.getElementById('btn-enviar-ac');
+  btn.disabled=true; btn.textContent='Enviando...';
+  const sucesso=await salvarSol(sol);
+  btn.disabled=false; btn.textContent='Enviar solicitação';
+  if(sucesso){
+    mostrarConclusao('acesso', sol.id);
+    resetForm();
+  }else{
+    alert('Não foi possível confirmar o envio ao NUTCI (falha de conexão). Sua solicitação NÃO foi registrada ainda — por favor, clique em "Enviar solicitação" novamente. Se o problema persistir, entre em contato pelo WhatsApp.');
+  }
 }
 
 async function enviarLotacao(){
@@ -1986,7 +2236,7 @@ async function enviarLotacao(){
     {el:document.getElementById('lot-cpf'),   tipo:'cpf'},
     {el:document.getElementById('lot-wpp'),   tipo:'tel'},
     {el:document.getElementById('lot-email'), tipo:'email'},
-    {el:document.getElementById('lot-escola'),tipo:'nome'},
+    {el:document.getElementById('lot-escola'),tipo:'select'},
   ];
   let ok=true;
   campos.forEach(c=>{if(!validarCampo(c.el,c.tipo)) ok=false;});
@@ -1994,11 +2244,11 @@ async function enviarLotacao(){
     alert('Selecione todas as opções obrigatórias.'); ok=false;
   }
   if(radios['comp']==='sim'&&!v('lot-escola-comp')){
-    validarCampo(document.getElementById('lot-escola-comp'),'nome'); ok=false;
+    validarCampo(document.getElementById('lot-escola-comp'),'select'); ok=false;
   }
   if(arquivosSelecionados.length===0){alert('Anexe o quadro escolar e os diplomas antes de enviar.');return;}
   if(radios['mudou']==='sim'&&!v('lot-escola-origem')){
-    validarCampo(document.getElementById('lot-escola-origem'),'nome'); ok=false;
+    validarCampo(document.getElementById('lot-escola-origem'),'select'); ok=false;
   }
   if(!ok) return;
   const btn=document.getElementById('btn-enviar-lot');
@@ -2016,9 +2266,16 @@ async function enviarLotacao(){
     semDocsRemocao:radios['sem-docs-remocao']||'nao',
     verificLicenca:'',verificMudou:'',
     arquivos:arquivos||[],obs:''};
-  salvarSol(sol);
-  mostrarConclusao('lotacao', sol.id);
-  resetForm();
+  const btnFinal=document.getElementById('btn-enviar-lot');
+  btnFinal.disabled=true; btnFinal.textContent='Enviando...';
+  const sucesso=await salvarSol(sol);
+  btnFinal.disabled=false; btnFinal.textContent='Enviar solicitação';
+  if(sucesso){
+    mostrarConclusao('lotacao', sol.id);
+    resetForm();
+  }else{
+    alert('Não foi possível confirmar o envio ao NUTCI (falha de conexão). Sua solicitação NÃO foi registrada ainda — por favor, clique em "Enviar solicitação" novamente. Se o problema persistir, entre em contato pelo WhatsApp.');
+  }
 }
 
 function mostrarConclusao(tipo, solId){
@@ -2167,7 +2424,7 @@ async function selecionarDocConsulta(inp, solId){
     if(idx!==-1){
       if(!solicitacoes[idx].arquivos) solicitacoes[idx].arquivos=[];
       solicitacoes[idx].arquivos.push({...resultado, tipo:'oficio_apresentacao'});
-      localStorage.setItem('nutci_sols',JSON.stringify(solicitacoes));
+      salvarSolicitacoesLocal();
 
       // 4. Sincroniza de volta ao Sheets
       await sincronizarAtualizacao(solicitacoes[idx]);
@@ -2325,7 +2582,7 @@ function atualizarBadgeNovas(){
 
 function marcarComoVisto(){
   if(solicitacoes.length===0) return;
-  localStorage.setItem('nutci_visto', String(solicitacoes[0].id));
+  salvarLocalSeguro('nutci_visto', String(solicitacoes[0].id));
   atualizarBadgeNovas();
 }
 
@@ -2336,7 +2593,7 @@ function recebimentoBloqueado(){
 
 function toggleBloqueio(){
   const bloqueado=recebimentoBloqueado();
-  localStorage.setItem('nutci_bloqueio', bloqueado?'0':'1');
+  salvarLocalSeguro('nutci_bloqueio', bloqueado?'0':'1');
   renderBloqueioStatus();
 }
 
@@ -2358,11 +2615,11 @@ function renderBloqueioStatus(){
   }
 }
 
-function salvarSol(sol){
+async function salvarSol(sol){
   solicitacoes.unshift(sol);
-  localStorage.setItem('nutci_sols',JSON.stringify(solicitacoes));
+  salvarSolicitacoesLocal();
   atualizarBadgeNovas();
-  enviarParaSheets(sol); // envia para Google Sheets
+  return await enviarParaSheets(sol); // devolve true só se o servidor confirmou o recebimento
 }
 
 function resetForm(){
@@ -2370,23 +2627,34 @@ function resetForm(){
   document.querySelectorAll('.ropt').forEach(o=>o.classList.remove('sel'));
   document.querySelectorAll('input[type=text],input[type=email],input[type=tel],input[type=date],select,textarea').forEach(i=>{if(i.tagName==='SELECT')i.selectedIndex=0;else i.value='';});
   document.querySelectorAll('.alerta').forEach(a=>a.style.display='none');
-  document.getElementById('campo-comp').classList.add('hidden');
-  document.getElementById('campo-oficio').classList.add('hidden');
+  document.getElementById('campo-comp')?.classList.add('hidden');
+  document.getElementById('campo-oficio')?.classList.add('hidden');
   oficioSelecionado=null;
-  document.getElementById('file-oficio').value='';
+  const fileOficio=document.getElementById('file-oficio');
+  if(fileOficio) fileOficio.value='';
   const faOficio=document.getElementById('fa-oficio');
-  faOficio.classList.remove('has-file');
-  faOficio.childNodes[0].textContent='Clique para selecionar o ofício (PDF, JPG ou PNG)';
-  document.getElementById('oficio-nome').style.display='none';
-  document.getElementById('bloco-sem-siage').style.display='none';
-  document.getElementById('resto-lotacao').style.display='block';
-  document.getElementById('btn-enviar-lot').style.display='block';
+  if(faOficio){
+    faOficio.classList.remove('has-file');
+    if(faOficio.childNodes[0]) faOficio.childNodes[0].textContent='Clique para selecionar o ofício (PDF, JPG ou PNG)';
+  }
+  const oficioNome=document.getElementById('oficio-nome');
+  if(oficioNome) oficioNome.style.display='none';
+  const blocoSemSiage=document.getElementById('bloco-sem-siage');
+  if(blocoSemSiage) blocoSemSiage.style.display='none';
+  const restoLotacao=document.getElementById('resto-lotacao');
+  if(restoLotacao) restoLotacao.style.display='block';
+  const btnEnviarLot=document.getElementById('btn-enviar-lot');
+  if(btnEnviarLot) btnEnviarLot.style.display='block';
   const fa=document.getElementById('fa-docs');
-  fa.classList.remove('has-file');
-  fa.childNodes[0].textContent='Clique para selecionar arquivos (PDF, JPG ou PNG)';
-  document.getElementById('upload-nomes').style.display='none';
-  ['upload-ok','upload-err','upload-progress'].forEach(id=>document.getElementById(id).style.display='none');
-  document.getElementById('file-docs').value='';
+  if(fa){
+    fa.classList.remove('has-file');
+    if(fa.childNodes[0]) fa.childNodes[0].textContent='Clique para selecionar arquivos (PDF, JPG ou PNG)';
+  }
+  const uploadNomes=document.getElementById('upload-nomes');
+  if(uploadNomes) uploadNomes.style.display='none';
+  ['upload-ok','upload-err','upload-progress'].forEach(id=>{ const el=document.getElementById(id); if(el) el.style.display='none'; });
+  const fileDocs=document.getElementById('file-docs');
+  if(fileDocs) fileDocs.value='';
   // Limpa validação visual
   document.querySelectorAll('.valid,.invalid').forEach(el=>el.classList.remove('valid','invalid'));
   document.querySelectorAll('.field-error').forEach(el=>el.classList.remove('visible'));
@@ -2432,7 +2700,7 @@ function statusBadge(s){
 let _filaPendente=JSON.parse(localStorage.getItem('nutci_fila')||'[]');
 
 function salvarFila(){
-  localStorage.setItem('nutci_fila',JSON.stringify(_filaPendente));
+  salvarLocalSeguro('nutci_fila',JSON.stringify(_filaPendente));
 }
 
 function atualizarIndicadorSync(){
@@ -2456,22 +2724,29 @@ function atualizarIndicadorSync(){
 
 async function sincronizarAtualizacao(sol){
   // Salva localmente primeiro — sempre
-  localStorage.setItem('nutci_sols',JSON.stringify(solicitacoes));
+  salvarSolicitacoesLocal();
 
   try{
+    const controller=new AbortController();
+    const timeout=setTimeout(()=>controller.abort(), 30000); // 30s — margem maior pra um backend sob carga
     const resp=await fetch(SHEETS_URL,{
       method:'POST',
       headers:{'Content-Type':'text/plain'},
-      body:JSON.stringify({...sol, _operacao:'atualizar'})
+      body:JSON.stringify({...sol, _operacao:'atualizar'}),
+      signal:controller.signal
     });
+    clearTimeout(timeout);
+    if(!resp.ok) throw new Error('HTTP '+resp.status+' — servidor recusou a requisição');
     const data=await resp.json();
-    if(!data.ok) throw new Error('Sheets recusou');
+    if(!data.ok) throw new Error('Servidor respondeu com erro: '+(data.erro||'motivo desconhecido'));
+    console.info('[sync] Atualização confirmada para id',sol.id);
     // Remove da fila se estava pendente
     _filaPendente=_filaPendente.filter(p=>p.id!==sol.id);
     salvarFila();
     atualizarIndicadorSync();
   }catch(e){
-    // Enfileira para reenvio
+    console.warn('[sync] FALHOU ao sincronizar id',sol.id,'—',e.name==='AbortError'?'timeout (30s) — servidor não respondeu a tempo':e.message);
+    // Enfileira para reenvio (inclui timeout — demora também conta como falha agora)
     const jaExiste=_filaPendente.findIndex(p=>p.id===sol.id);
     if(jaExiste>=0) _filaPendente[jaExiste]=sol;
     else _filaPendente.push(sol);
@@ -2482,20 +2757,31 @@ async function sincronizarAtualizacao(sol){
 
 async function tentarReenviarFila(){
   if(_filaPendente.length===0) return;
+  console.info('[sync] Tentando reenviar',_filaPendente.length,'atualização(ões) pendente(s)...');
   const copia=[..._filaPendente];
   for(const sol of copia){
     try{
+      const controller=new AbortController();
+      const timeout=setTimeout(()=>controller.abort(), 30000);
       const resp=await fetch(SHEETS_URL,{
         method:'POST',
         headers:{'Content-Type':'text/plain'},
-        body:JSON.stringify({...sol, _operacao:'atualizar'})
+        body:JSON.stringify({...sol, _operacao:'atualizar'}),
+        signal:controller.signal
       });
+      clearTimeout(timeout);
       const data=await resp.json();
       if(data.ok){
+        console.info('[sync] Reenvio confirmado para id',sol.id);
         _filaPendente=_filaPendente.filter(p=>p.id!==sol.id);
         salvarFila();
+      }else{
+        console.warn('[sync] Reenvio recusado pelo servidor para id',sol.id,'—',data.erro||'motivo desconhecido');
       }
-    }catch(e){ break; } // Se ainda sem conexão, para
+    }catch(e){
+      console.warn('[sync] Reenvio falhou para id',sol.id,'—',e.name==='AbortError'?'timeout (30s)':e.message);
+      break; // Se ainda sem conexão/lento, para e tenta de novo depois
+    }
   }
   atualizarIndicadorSync();
 }
@@ -2573,22 +2859,96 @@ function renderPaginacao(total, pagAtual, onClickFn, containerId){
 function mudarPaginaGeral(p){ _paginaGeral=p; renderGeral(); window.scrollTo({top:0,behavior:'smooth'}); }
 function mudarPaginaPainel(p){ _paginaPainel=p; renderCards(); window.scrollTo({top:0,behavior:'smooth'}); }
 
+let _filtroAguardandoPainel=false;
+let _mostrarOcultosPainel=false;
+
+function buscarPainel(){
+  _paginaPainel=1;
+  renderCards();
+}
+
+function toggleFiltroAguardandoPainel(){
+  _filtroAguardandoPainel=!_filtroAguardandoPainel;
+  _paginaPainel=1;
+  renderCards();
+}
+
+function toggleMostrarOcultosPainel(){
+  _mostrarOcultosPainel=!_mostrarOcultosPainel;
+  _paginaPainel=1;
+  renderCards();
+}
+
+function sincronizarFiltroEscola(){
+  const sel=document.getElementById('fil-escola');
+  if(!sel) return;
+  const anterior=sel.value;
+  sel.innerHTML='<option value="">Todas as escolas</option>'+
+    ESCOLAS_2GRE.map(e=>`<option value="${e.replace(/"/g,'&quot;')}">${e}</option>`).join('');
+  if(anterior && ESCOLAS_2GRE.includes(anterior)) sel.value=anterior;
+}
+
+function atualizarControlesFiltroPainel(){
+  const totalOcultos=solicitacoes.filter(s=>s.oculto).length;
+  const btnOcultos=document.getElementById('btn-toggle-ocultos');
+  if(btnOcultos){
+    btnOcultos.textContent=_mostrarOcultosPainel?'↩ Voltar ao painel':`🙈 Mostrar ocultados (${totalOcultos})`;
+    btnOcultos.classList.toggle('active-filtro',_mostrarOcultosPainel);
+  }
+  const btnAguardando=document.getElementById('btn-filtro-aguardando');
+  if(btnAguardando){
+    const totalAguardando=solicitacoes.filter(s=>!s.oculto && semAcao(s)).length;
+    btnAguardando.textContent=`🔴 Aguardando ação (${totalAguardando})`;
+    btnAguardando.classList.toggle('active-filtro',_filtroAguardandoPainel);
+  }
+}
+
+function ocultarCard(id){
+  const idx=solicitacoes.findIndex(s=>s.id===id);
+  if(idx===-1) return;
+  solicitacoes[idx].oculto=true;
+  sincronizarAtualizacao(solicitacoes[idx]);
+  renderCards();
+}
+
+function restaurarCard(id){
+  const idx=solicitacoes.findIndex(s=>s.id===id);
+  if(idx===-1) return;
+  solicitacoes[idx].oculto=false;
+  sincronizarAtualizacao(solicitacoes[idx]);
+  renderCards();
+}
+
 function limparFiltrosPainel(){
   document.getElementById('painel-busca').value='';
   document.getElementById('fil-tipo').value='';
   sincronizarFiltroStatus();
   document.getElementById('fil-status').value='';
+  const filEscolaEl=document.getElementById('fil-escola');
+  if(filEscolaEl) filEscolaEl.value='';
+  _filtroAguardandoPainel=false;
+  _mostrarOcultosPainel=false;
+  _paginaPainel=1;
   renderCards();
 }
 
 function renderCards(){
+  sincronizarFiltroEscola();
   const busca=(document.getElementById('painel-busca')?.value||'').toLowerCase();
   const filTipo=document.getElementById('fil-tipo').value;
   const filStatus=document.getElementById('fil-status').value;
+  const filEscola=document.getElementById('fil-escola')?.value||'';
   const list=document.getElementById('cards-list');
   let sols=solicitacoes.filter(s=>{
+    if(_mostrarOcultosPainel){
+      if(!s.oculto) return false; // no modo "ocultados", mostra só os que estão ocultos
+    } else {
+      if(s.oculto) return false; // modo normal — cards ocultos não aparecem nem contam
+    }
     if(filTipo&&s.tipo!==filTipo) return false;
     if(filStatus&&s.status!==filStatus) return false;
+    if(filEscola&&(s.escola||'')!==filEscola) return false;
+    if(_filtroAguardandoPainel&&!semAcao(s)) return false;
     if(busca){
       const nome=(s.tipo==='lotacao'?s.prof:s.nome||'').toLowerCase();
       const mat=(s.mat||'').toLowerCase();
@@ -2597,7 +2957,11 @@ function renderCards(){
     }
     return true;
   });
-  if(sols.length===0){list.innerHTML='<div class="empty">Nenhuma solicitação encontrada.</div>';return;}
+  atualizarControlesFiltroPainel();
+  if(sols.length===0){
+    list.innerHTML=`<div class="empty">${_mostrarOcultosPainel?'Nenhum card ocultado no momento.':'Nenhuma solicitação encontrada.'}</div>`;
+    return;
+  }
   const totalPag=Math.ceil(sols.length/POR_PAGINA);
   if(_paginaPainel>totalPag) _paginaPainel=1;
   const fatia=sols.slice((_paginaPainel-1)*POR_PAGINA, _paginaPainel*POR_PAGINA);
@@ -2657,12 +3021,12 @@ function renderCard(s){
     return html;
   })();
 
-  const nova=semAcao(s);
-  return `<div class="card" id="card-${s.id}" style="${nova?'border-left:3px solid #F5D97A;background:#FFFBF0;':''}">
+  const d=calcularDestaqueCard(s);
+  return `<div class="card" id="card-${s.id}" style="${d.border?('border-left:3px solid '+d.border+';'):''}${d.bg?('background:'+d.bg+';'):''}">
     <div class="card-header">
       <div style="flex:1">
-        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px">
-          ${nova?'<span style="font-size:12px;font-weight:600;color:#92680A;background:#FEF9EC;border:1px solid #F5D97A;padding:2px 8px;border-radius:20px">🔴 Aguardando ação</span>':''}
+        <div id="card-badges-${s.id}" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px">
+          ${d.tipo==='aguardando'?'<span class="badge-aguardando-acao" style="font-size:12px;font-weight:600;color:#92680A;background:#FEF9EC;border:1px solid #F5D97A;padding:2px 8px;border-radius:20px">🔴 Aguardando ação</span>':''}
           ${tipoPill}
           ${statusBadge(s.status)}
         </div>
@@ -2677,6 +3041,9 @@ function renderCard(s){
       ${renderStatusSelect(s)}
       ${s.status==='Negado'?`<div style="margin-top:6px"><input type="text" placeholder="Motivo da negação..." value="${s.motivoNegado||''}" onchange="salvarMotivo(${s.id},this.value)" style="font-size:12px;padding:5px 10px;border:1px solid #e0e0e0;border-radius:8px;width:100%;font-family:system-ui,sans-serif"/></div>`:''}
       ${renderDocDropdown(s)}
+      ${_mostrarOcultosPainel
+        ? `<button class="btn-sm" style="color:#185FA5" onclick="restaurarCard(${s.id})">↩ Restaurar</button>`
+        : `<button class="btn-sm" onclick="ocultarCard(${s.id})">🙈 Ocultar</button>`}
       <button class="btn-sm" style="color:#A32D2D" onclick="excluir(${s.id})">Excluir</button>
     </div>
     <div style="border-top:1px solid #e0e0e0;padding-top:.75rem;margin-top:.75rem">
@@ -2795,7 +3162,9 @@ function salvarMotivo(id,val){
   const idx=solicitacoes.findIndex(s=>s.id===id);
   if(idx===-1) return;
   solicitacoes[idx].motivoNegado=val;
+  solicitacoes[idx].acaoRealizada=true;
   sincronizarAtualizacao(solicitacoes[idx]);
+  atualizarDestaqueCard(id);
 }
 
 function salvarObsComFeedback(id, btn, origem='painel'){
@@ -2814,9 +3183,11 @@ function salvarObs(id,val){
   const idx=solicitacoes.findIndex(s=>s.id===id);
   if(idx===-1) return;
   solicitacoes[idx].obs=val;
+  solicitacoes[idx].acaoRealizada=true;
   sincronizarAtualizacao(solicitacoes[idx]);
   const obsEl=document.getElementById('obs-card-'+id);
   if(obsEl&&obsEl.value!==val) obsEl.value=val;
+  atualizarDestaqueCard(id);
 }
 
 function mudarStatus(id,val){
@@ -2824,8 +3195,10 @@ function mudarStatus(id,val){
   if(idx===-1) return;
   solicitacoes[idx].status=val;
   solicitacoes[idx].dataStatus=new Date().toLocaleString('pt-BR');
+  solicitacoes[idx].acaoRealizada=true;
   sincronizarAtualizacao(solicitacoes[idx]);
   const s=solicitacoes[idx];
+  atualizarDestaqueCard(id);
   const cardEl=document.getElementById('card-'+id);
   if(!cardEl) return;
   const badgeEl=cardEl.querySelector('.badge');
@@ -2860,17 +3233,35 @@ function mudarStatus(id,val){
   }
 }
 
-function excluir(id){
+async function excluir(id){
   if(!confirm('Excluir esta solicitação? Esta ação não pode ser desfeita.')) return;
+  const backup=solicitacoes.find(s=>s.id===id);
+  const posicao=solicitacoes.findIndex(s=>s.id===id);
   solicitacoes=solicitacoes.filter(s=>s.id!==id);
-  localStorage.setItem('nutci_sols',JSON.stringify(solicitacoes));
-  // Sincroniza exclusão com o Sheets
-  fetch(SHEETS_URL,{
-    method:'POST',
-    headers:{'Content-Type':'text/plain'},
-    body:JSON.stringify({id, _operacao:'excluir'})
-  }).catch(e=>console.info('Erro ao excluir do Sheets:',e.message));
+  salvarSolicitacoesLocal();
   renderCards();
+  let sucesso=false;
+  for(let i=0;i<2 && !sucesso;i++){
+    try{
+      const resp=await fetch(SHEETS_URL,{
+        method:'POST',
+        headers:{'Content-Type':'text/plain'},
+        body:JSON.stringify({id, _operacao:'excluir'})
+      });
+      const data=await resp.json();
+      if(data && data.ok) sucesso=true;
+    }catch(e){ /* tenta de novo abaixo, se ainda houver tentativa */ }
+    if(!sucesso && i===0) await new Promise(r=>setTimeout(r,1500));
+  }
+  if(!sucesso){
+    // Não confirmou no servidor — devolve pro estado local pra não mentir que foi excluído
+    if(backup){
+      solicitacoes.splice(posicao,0,backup);
+      salvarSolicitacoesLocal();
+      renderCards();
+    }
+    alert('Não foi possível confirmar a exclusão no servidor (falha de conexão). A solicitação NÃO foi excluída — ela voltou a aparecer na lista. Tente excluir novamente em instantes.');
+  }
 }
 
 function toggleDrop(id){
@@ -2896,6 +3287,7 @@ function linksArquivos(s){
 function gerarOficio(id){
   const s=solicitacoes.find(x=>x.id===id);
   if(!s) return;
+  marcarAcaoRealizada(id);
 
   const dados={
     nome:      s.prof || '[NOME DO PROFESSOR]',
@@ -2930,6 +3322,7 @@ function gerarOficio(id){
 function gerarEmail(id, tipo){
   const s=solicitacoes.find(x=>x.id===id);
   if(!s) return;
+  marcarAcaoRealizada(id);
 
   const tpl=TEMPLATES[tipo];
   if(!tpl) return;
@@ -3035,41 +3428,13 @@ function abrirMailto(dest,assunto,corpo){window.open('mailto:'+dest+'?subject='+
 // Aplica templates editados salvos assim que todas as funções estão prontas
 aplicarTemplatesEditados();
 
-// ── Demonstração de upload (remove após integração com Drive) ──
-(function injetarDemoSeNecessario(){
-  const JA_INJETADO='nutci_demo_v1';
-  if(localStorage.getItem(JA_INJETADO)) return;
-  const demo={
-    id: 9999999999,
-    tipo:'lotacao',
-    status:'Pendente (aguardando interação)',
-    data:'28/04/2026 09:00:00',
-    quem:'O próprio professor',
-    prof:'Maria Aparecida Souza (DEMONSTRAÇÃO)',
-    mat:'654321',
-    wpp:'(83) 98888-0000',
-    email:'maria@escola.pb.gov.br',
-    escola:'EEEF Escola Exemplo',
-    siage:'sim',
-    comp:'nao',
-    escolaComp:'',
-    licenca:'nao',
-    mudou:'sim',
-    escolaOrigem:'EEEF Escola de Origem Exemplo',
-    verificLicenca:'',
-    verificMudou:'',
-    obs:'Esta é uma solicitação de demonstração para mostrar como os documentos aparecem no painel.',
-    motivoNegado:'',
-    arquivos:[
-      {nome:'Quadro_Escolar_2026.pdf', id:'demo1', link:'https://drive.google.com/file/d/exemplo1/view', tipo:'documento'},
-      {nome:'Diploma_Licenciatura.pdf', id:'demo2', link:'https://drive.google.com/file/d/exemplo2/view', tipo:'documento'},
-      {nome:'Oficio_Apresentacao.pdf', id:'demo3', link:'https://drive.google.com/file/d/exemplo3/view', tipo:'oficio_apresentacao'},
-    ]
-  };
-  solicitacoes.push(demo);
-  localStorage.setItem('nutci_sols', JSON.stringify(solicitacoes));
-  localStorage.setItem(JA_INJETADO,'1');
-})();
+// Carrega a lista de escolas do escolas.txt e popula os selects dos formulários públicos
+carregarListaEscolasArquivo();
+
+// Se sobrou algo pendente de uma sessão anterior (navegador fechado com fila pendente),
+// mostra o aviso na hora e já tenta reenviar, em vez de ficar em silêncio até 2min
+atualizarIndicadorSync();
+tentarReenviarFila();
 </script>
 </body>
 </html>
