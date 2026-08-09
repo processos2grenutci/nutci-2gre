@@ -239,13 +239,6 @@ body{font-family:system-ui,sans-serif;font-size:14px;color:#1a1a1a;background:#f
       </div>
       <div class="row2">
         <div class="field">
-          <label>Data de nascimento<span class="req">*</span></label>
-          <input type="date" id="ac-nasc"
-            onchange="validarCampo(this,'data');atualizarProgressoAcesso()"
-            onblur="validarCampo(this,'data')"/>
-          <div class="field-error" id="err-ac-nasc">Informe a data de nascimento.</div>
-        </div>
-        <div class="field">
           <label>Função na escola<span class="req">*</span></label>
           <select id="ac-funcao"
             onchange="validarCampo(this,'select');atualizarProgressoAcesso()">
@@ -258,14 +251,14 @@ body{font-family:system-ui,sans-serif;font-size:14px;color:#1a1a1a;background:#f
           </select>
           <div class="field-error" id="err-ac-funcao">Selecione a função.</div>
         </div>
-      </div>
-      <div class="field">
-        <label>Escola<span class="req">*</span></label>
-        <select id="ac-escola"
-          onchange="validarCampo(this,'select');atualizarProgressoAcesso()">
-          <option value="">Selecione a escola...</option>
-        </select>
-        <div class="field-error" id="err-ac-escola">Selecione a escola.</div>
+        <div class="field">
+          <label>Escola<span class="req">*</span></label>
+          <select id="ac-escola"
+            onchange="validarCampo(this,'select');atualizarProgressoAcesso()">
+            <option value="">Selecione a escola...</option>
+          </select>
+          <div class="field-error" id="err-ac-escola">Selecione a escola.</div>
+        </div>
       </div>
     </div>
     <div class="sec">
@@ -342,6 +335,17 @@ body{font-family:system-ui,sans-serif;font-size:14px;color:#1a1a1a;background:#f
         </div>
       </div>
     </div>
+
+    <div class="sec hidden" id="bloco-lote-pergunta">
+      <div class="sec-title">👥 Deseja solicitar a lotação de mais de um professor?</div>
+      <p style="font-size:13px;color:#666;margin-bottom:1rem;line-height:1.6">Se você precisa realizar atualizações de lotação para vários professores da sua escola, pode enviar todas as solicitações de uma só vez.</p>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <button type="button" class="btn-sm" onclick="escolherModoLotacao('individual')" style="flex:1;min-width:180px;padding:12px;font-size:13px">Continuar com lotação individual</button>
+        <button type="button" class="btn-sm primary" onclick="escolherModoLotacao('lote')" style="flex:1;min-width:180px;padding:12px;font-size:13px">Iniciar lotação em lote</button>
+      </div>
+    </div>
+
+    <div id="lote-form-individual">
     <div class="sec">
       <div class="sec-title">Dados do professor</div>
       <div class="field">
@@ -391,35 +395,6 @@ body{font-family:system-ui,sans-serif;font-size:14px;color:#1a1a1a;background:#f
         </select>
         <div class="field-error" id="err-lot-escola">Selecione a escola de lotação.</div>
       </div>
-    </div>
-    <div class="sec">
-      <div class="sec-title">Situação funcional</div>
-      <div class="field">
-        <label>Já tem cadastro no SIAGE?<span class="req">*</span></label>
-        <div class="radio-group" id="rg-siage">
-          <label class="ropt" onclick="selR('siage','sim',this)"><input type="radio">Sim</label>
-          <label class="ropt" onclick="selR('siage','nao',this)"><input type="radio">Não</label>
-        </div>
-      </div>
-      <div class="field">
-        <label>É professor(a) de disciplina técnica em ECIT?<span class="req">*</span></label>
-        <p style="font-size:12px;color:#666;margin:3px 0 6px;line-height:1.5">Por exemplo: Sou professor da disciplina de Programação II, do curso técnico de Informática.</p>
-        <div class="radio-group" id="rg-ecit-lot">
-          <label class="ropt" onclick="selR('ecit-lot','sim',this)"><input type="radio">Sim</label>
-          <label class="ropt" onclick="selR('ecit-lot','nao',this)"><input type="radio">Não</label>
-        </div>
-      </div>
-    </div>
-
-    <div id="bloco-sem-siage" style="display:none;background:#FDEAEA;border:1px solid #f7c1c1;border-radius:12px;padding:1.25rem;margin-bottom:.875rem">
-      <div style="font-size:14px;font-weight:500;color:#A32D2D;margin-bottom:.5rem">Cadastro no SIAGE obrigatório</div>
-      <p style="font-size:13px;color:#7a2020;line-height:1.6;margin-bottom:1rem">Para solicitar a lotação, o professor precisa ter um cadastro ativo no SIAGE. Realize primeiro a solicitação de criação de acesso e, após a confirmação, volte aqui para continuar.</p>
-      <button class="btn-sm primary" onclick="irParaAcesso()" style="width:100%;padding:10px;font-size:13px">Ir para o formulário de criação de acesso SIAGE</button>
-    </div>
-
-    <div id="resto-lotacao">
-    <div class="sec">
-      <div class="sec-title">Situação funcional (continuação)</div>
       <div class="field">
         <label style="display:flex;align-items:center;gap:6px">
           Complementa carga horária em outra escola?<span class="req">*</span>
@@ -442,6 +417,35 @@ body{font-family:system-ui,sans-serif;font-size:14px;color:#1a1a1a;background:#f
           <option value="">Selecione a escola...</option>
         </select>
         <div class="field-error" id="err-lot-escola-comp">Selecione a escola de complementação.</div>
+      </div>
+    </div>
+    <div class="sec">
+      <div class="sec-title">Situação funcional</div>
+      <div class="field">
+        <label>Já tem cadastro no SIAGE?<span class="req">*</span></label>
+        <div class="radio-group" id="rg-siage">
+          <label class="ropt" onclick="selR('siage','sim',this)"><input type="radio">Sim</label>
+          <label class="ropt" onclick="selR('siage','nao',this)"><input type="radio">Não</label>
+        </div>
+      </div>
+    </div>
+
+    <div id="bloco-sem-siage" style="display:none;background:#FDEAEA;border:1px solid #f7c1c1;border-radius:12px;padding:1.25rem;margin-bottom:.875rem">
+      <div style="font-size:14px;font-weight:500;color:#A32D2D;margin-bottom:.5rem">Cadastro no SIAGE obrigatório</div>
+      <p style="font-size:13px;color:#7a2020;line-height:1.6;margin-bottom:1rem">Para solicitar a lotação, o professor precisa ter um cadastro ativo no SIAGE. Realize primeiro a solicitação de criação de acesso e, após a confirmação, volte aqui para continuar.</p>
+      <button class="btn-sm primary" onclick="irParaAcesso()" style="width:100%;padding:10px;font-size:13px">Ir para o formulário de criação de acesso SIAGE</button>
+    </div>
+
+    <div id="resto-lotacao">
+    <div class="sec">
+      <div class="sec-title">Situação funcional (continuação)</div>
+      <div class="field">
+        <label>É professor(a) de disciplina técnica em ECIT?<span class="req">*</span></label>
+        <p style="font-size:12px;color:#666;margin:3px 0 6px;line-height:1.5">Por exemplo: Sou professor da disciplina de Programação II, do curso técnico de Informática.</p>
+        <div class="radio-group" id="rg-ecit-lot">
+          <label class="ropt" onclick="selR('ecit-lot','sim',this)"><input type="radio">Sim</label>
+          <label class="ropt" onclick="selR('ecit-lot','nao',this)"><input type="radio">Não</label>
+        </div>
       </div>
       <div class="field">
         <label>Se afastou com licença nos últimos 6 meses?<span class="req">*</span></label>
@@ -493,6 +497,23 @@ body{font-family:system-ui,sans-serif;font-size:14px;color:#1a1a1a;background:#f
       </div>
     </div>
     <button class="btn-primary" id="btn-enviar-lot" onclick="enviarLotacao()">Enviar solicitação</button>
+    </div>
+    </div>
+
+    <!-- MODO LOTE: vários professores numa solicitação só -->
+    <div id="lote-form-multiplo" class="hidden">
+      <div id="lote-blocos"></div>
+      <button type="button" class="btn-sm" onclick="adicionarProfessorLote()" style="width:100%;padding:10px;margin-bottom:1rem">+ Adicionar outro professor</button>
+      <div class="sec">
+        <div style="font-size:13px;color:#666;margin-bottom:.75rem" id="lote-resumo">1 professor adicionado</div>
+        <label style="display:flex;align-items:flex-start;gap:8px;font-size:13px;color:#1a1a1a;cursor:pointer;margin-bottom:1rem">
+          <input type="checkbox" id="lote-declaro" style="margin-top:3px"/>
+          Declaro que as informações prestadas para todos os professores acima são verdadeiras.
+        </label>
+        <div id="lote-erro-geral" style="display:none;background:#FDEAEA;border:1px solid #f7c1c1;border-radius:8px;padding:10px 14px;font-size:13px;color:#A32D2D;margin-bottom:.875rem"></div>
+        <div id="lote-progresso" style="display:none;background:#EBF3FB;border:1px solid #b5d4f4;border-radius:8px;padding:10px 14px;font-size:13px;color:#185FA5;margin-bottom:.875rem"></div>
+        <button class="btn-primary" id="btn-enviar-lote" onclick="enviarLote()">Enviar solicitação</button>
+      </div>
     </div>
   </div>
   <!-- TELA DE CONCLUSÃO -->
@@ -549,14 +570,14 @@ body{font-family:system-ui,sans-serif;font-size:14px;color:#1a1a1a;background:#f
 <div id="page-consulta" class="hidden">
   <div class="header">
     <h1>Acompanhar minha solicitação</h1>
-    <p>Consulte o andamento pelo seu CPF ou matrícula</p>
+    <p>Consulte o andamento pelo seu CPF, matrícula, ou protocolo do lote</p>
   </div>
   <div class="sec">
     <div class="sec-title">Buscar por</div>
     <div class="field">
-      <label>CPF ou Matrícula</label>
+      <label>CPF, matrícula ou protocolo do lote</label>
       <input type="text" id="consulta-input"
-        placeholder="Digite seu CPF (000.000.000-00) ou matrícula"
+        placeholder="CPF, matrícula ou protocolo (ex: 1786048776993)"
         oninput="if(this.value.replace(/\D/g,'').length<=11&&!isNaN(this.value.replace(/[\.\-]/g,''))) mascaraCPFConsulta(this)"
         onkeydown="if(event.key==='Enter') buscarSolicitacao()"/>
     </div>
@@ -737,6 +758,7 @@ async function carregarListaEscolasArquivo(){
     ESCOLAS_2GRE.sort((a,b)=>a.localeCompare(b,'pt-BR'));
     popularSelectsEscolaFormularios();
     sincronizarFiltroEscola();
+    if(modoLote) popularSelectsEscolaLote();
   }catch(e){
     console.warn('Erro ao carregar escolas.txt:',e.message);
     IDS_SELECT_ESCOLA.forEach(id=>{
@@ -865,7 +887,6 @@ Dados para atendimento da solicitação:
 - Nome completo: {{nome}}
 - Matrícula: {{matricula}}
 - CPF: {{cpf}}
-- Data de nascimento: {{nascimento}}
 - Escola: {{escola}}
 - Função: {{funcao}}
 - E-mail institucional (se houver): {{emailInst}}
@@ -1199,7 +1220,6 @@ const PASSOS_ACESSO=[
   {id:'ac-nome',     label:'Nome',                 tipo:'text'},
   {id:'ac-mat',      label:'Matrícula',             tipo:'text'},
   {id:'ac-cpf',      label:'CPF',                  tipo:'cpf'},
-  {id:'ac-nasc',     label:'Nascimento',            tipo:'text'},
   {id:'ac-funcao',   label:'Função',               tipo:'select'},
   {id:'ac-escola',   label:'Escola',               tipo:'select'},
   {id:'ac-wpp',      label:'WhatsApp',             tipo:'tel'},
@@ -1394,7 +1414,7 @@ function getConfig(){
 
 // Metadados de cada template: nome legível e variáveis obrigatórias
 const TPL_META = {
-  acesso_padrao:   { label: 'E-mail de acesso (padrão)',         vars: ['nome','matricula','cpf','nascimento','escola','funcao','emailInst','wpp','emailPes','descricaoAcesso','verboAcao','assinatura'] },
+  acesso_padrao:   { label: 'E-mail de acesso (padrão)',         vars: ['nome','matricula','cpf','escola','funcao','emailInst','wpp','emailPes','descricaoAcesso','verboAcao','assinatura'] },
   criar_siage:     { label: 'E-mail — Criar SIAGE',              vars: ['nome','matricula','escola','wpp','email','assinatura'] },
   lotacao_padrao:  { label: 'E-mail de lotação (padrão)',        vars: ['nome','matricula','escola','wpp','email','assinatura'] },
   complementacao:  { label: 'E-mail de complementação de carga', vars: ['nome','matricula','escola','escolaComp','wpp','email','assinatura'] },
@@ -1409,7 +1429,6 @@ const TPL_PREVIEW_DADOS = {
   nome:       'Maria Oliveira',
   matricula:  '123456',
   cpf:        '000.000.000-00',
-  nascimento: '01/01/1985',
   escola:     'EEEF Exemplo de Escola',
   escolaComp: 'EEEF Escola Complementar',
   funcao:     'Professor(a)',
@@ -1620,6 +1639,12 @@ function selR(grupo,valor,el){
   radios[grupo]=valor;
   document.querySelectorAll('#rg-'+grupo+' .ropt').forEach(o=>o.classList.remove('sel'));
   el.classList.add('sel');
+  if(grupo==='quem'){
+    const bloco=document.getElementById('bloco-lote-pergunta');
+    if(bloco) bloco.classList.toggle('hidden', valor!=='gestor');
+    // Se voltar pra "próprio professor" depois de já ter escolhido lote, volta tudo pro modo individual
+    if(valor==='professor' && modoLote) escolherModoLotacao('individual');
+  }
   if(grupo==='plataforma'){
     document.getElementById('alert-plataforma-siage').style.display=valor==='siage'?'block':'none';
   }
@@ -1701,19 +1726,44 @@ function v(id){return(document.getElementById(id)||{}).value||'';}
 
 let oficioSelecionado=null;
 
+function renderListaArquivos(){
+  const nomes=document.getElementById('upload-nomes');
+  const fa=document.getElementById('fa-docs');
+  if(!nomes||!fa) return;
+  if(arquivosSelecionados.length===0){
+    nomes.style.display='none';
+    nomes.innerHTML='';
+    fa.classList.remove('has-file');
+    fa.childNodes[0].textContent='Clique para selecionar arquivos (PDF, JPG ou PNG)';
+    return;
+  }
+  fa.classList.add('has-file');
+  fa.childNodes[0].textContent=arquivosSelecionados.length+' arquivo(s) selecionado(s)';
+  nomes.style.display='flex';
+  nomes.style.flexWrap='wrap';
+  nomes.style.gap='6px';
+  nomes.innerHTML=arquivosSelecionados.map((f,i)=>`
+    <span style="display:inline-flex;align-items:center;gap:5px;background:#EBF3FB;color:#185FA5;border-radius:20px;padding:3px 6px 3px 10px;font-size:12px;max-width:100%">
+      <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:220px">${f.name}</span>
+      <button type="button" onclick="removerArquivo(${i})" title="Remover" style="background:#185FA5;color:#fff;border:none;border-radius:50%;width:16px;height:16px;min-width:16px;font-size:11px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0">✕</button>
+    </span>`).join('');
+}
+
 function selecionarArquivos(inp){
   arquivosSelecionados=Array.from(inp.files);
-  const fa=document.getElementById('fa-docs');
-  const nomes=document.getElementById('upload-nomes');
-  if(arquivosSelecionados.length>0){
-    fa.classList.add('has-file');
-    fa.childNodes[0].textContent=arquivosSelecionados.length+' arquivo(s) selecionado(s)';
-    nomes.textContent=arquivosSelecionados.map(f=>f.name).join(', ');
-    nomes.style.display='block';
-  }
   document.getElementById('upload-ok').style.display='none';
   document.getElementById('upload-err').style.display='none';
+  renderListaArquivos();
   atualizarProgressoLotacao();
+}
+
+function removerArquivo(idx){
+  arquivosSelecionados.splice(idx,1);
+  renderListaArquivos();
+  atualizarProgressoLotacao();
+  // Limpa o input nativo pra permitir reselecionar os mesmos arquivos depois, se precisar
+  const fileDocs=document.getElementById('file-docs');
+  if(fileDocs) fileDocs.value='';
 }
 
 function selecionarOficio(inp){
@@ -1866,7 +1916,6 @@ async function enviarAcesso(){
     {el:document.getElementById('ac-nome'),   tipo:'nome'},
     {el:document.getElementById('ac-mat'),    tipo:'mat'},
     {el:document.getElementById('ac-cpf'),    tipo:'cpf'},
-    {el:document.getElementById('ac-nasc'),   tipo:'data'},
     {el:document.getElementById('ac-funcao'), tipo:'select'},
     {el:document.getElementById('ac-escola'), tipo:'select'},
     {el:document.getElementById('ac-wpp'),    tipo:'tel'},
@@ -1883,7 +1932,7 @@ async function enviarAcesso(){
   if(!ok) return;
   const sol={id:Date.now(),tipo:'acesso',status:'Pendente',data:new Date().toLocaleString('pt-BR'),
     solicitacao:radios['solicitacao'],plataforma:radios['plataforma'],
-    nome:v('ac-nome'),mat:v('ac-mat'),cpf:v('ac-cpf'),nasc:v('ac-nasc'),
+    nome:v('ac-nome'),mat:v('ac-mat'),cpf:v('ac-cpf'),
     funcao:v('ac-funcao'),escola:v('ac-escola'),emailInst:v('ac-email-inst'),
     wpp:v('ac-wpp'),emailPes:v('ac-email-pes'),ecit:radios['ecit'],licenca:radios['licenca-ac'],obs:''};
   const btn=document.getElementById('btn-enviar-ac');
@@ -1896,6 +1945,403 @@ async function enviarAcesso(){
   }else{
     alert('Não foi possível confirmar o envio ao NUTCI (falha de conexão). Sua solicitação NÃO foi registrada ainda — por favor, clique em "Enviar solicitação" novamente. Se o problema persistir, entre em contato pelo WhatsApp.');
   }
+}
+
+// ══════════════════════════════════════════════
+//  LOTAÇÃO EM LOTE (vários professores numa solicitação só)
+// ══════════════════════════════════════════════
+let modoLote=false;
+let loteProfessores=[];
+const LOTE_MAX=5;
+
+function novoProfessorLote(){
+  return {
+    prof:'', mat:'', wpp:'', escola:'',
+    siage:'', ecitLot:'', comp:'', escolaComp:'',
+    licenca:'', mudou:'', escolaOrigem:'',
+    arquivos:[],
+    expandido:true,
+  };
+}
+
+function escolherModoLotacao(modo){
+  const progWrap=document.getElementById('prog-lot-wrap');
+  if(modo==='lote'){
+    modoLote=true;
+    document.getElementById('lote-form-individual').classList.add('hidden');
+    document.getElementById('lote-form-multiplo').classList.remove('hidden');
+    if(progWrap) progWrap.classList.add('hidden');
+    if(loteProfessores.length===0) loteProfessores=[novoProfessorLote()];
+    renderBlocosLote();
+  }else{
+    modoLote=false;
+    document.getElementById('lote-form-multiplo').classList.add('hidden');
+    document.getElementById('lote-form-individual').classList.remove('hidden');
+    if(progWrap) progWrap.classList.remove('hidden');
+  }
+}
+
+function popularSelectsEscolaLote(){
+  loteProfessores.forEach((p,i)=>{
+    const mapa=[['escola','[data-lote-escola="'+i+'"]'],['escolaComp','[data-lote-escola-comp="'+i+'"]'],['escolaOrigem','[data-lote-escola-origem="'+i+'"]']];
+    mapa.forEach(([campo,seletor])=>{
+      const sel=document.querySelector(seletor);
+      if(sel){
+        sel.innerHTML='<option value="">Selecione a escola...</option>'+
+          ESCOLAS_2GRE.map(e=>`<option value="${e.replace(/"/g,'&quot;')}" ${p[campo]===e?'selected':''}>${e}</option>`).join('');
+      }
+    });
+  });
+}
+
+function renderBlocosLote(){
+  const cont=document.getElementById('lote-blocos');
+  cont.innerHTML=loteProfessores.map((p,i)=>renderBlocoProfessorLote(p,i)).join('');
+  popularSelectsEscolaLote();
+  loteProfessores.forEach((p,i)=>renderArquivosLote(i));
+  const resumo=document.getElementById('lote-resumo');
+  resumo.textContent=loteProfessores.length+(loteProfessores.length===1?' professor adicionado':' professores adicionados');
+}
+
+function renderBlocoProfessorLote(p,i){
+  if(!p.expandido){
+    return `<div class="sec" style="display:flex;justify-content:space-between;align-items:center;padding:.875rem 1rem">
+      <div>
+        <div style="font-weight:600;font-size:14px;color:#1a1a1a">Professor ${i+1}${p.prof?' — '+p.prof:''}</div>
+        <div style="font-size:12px;color:#666">${p.mat?'Mat. '+p.mat:'(dados incompletos)'}${p.escola?' · '+p.escola:''}</div>
+      </div>
+      <div style="display:flex;gap:6px;flex-shrink:0">
+        <button type="button" class="btn-sm" onclick="editarProfessorLote(${i})">Editar</button>
+        <button type="button" class="btn-sm" style="color:#A32D2D" onclick="removerProfessorLote(${i})">Remover</button>
+      </div>
+    </div>`;
+  }
+  return `<div class="sec" id="lote-bloco-${i}">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.75rem">
+      <div class="sec-title" style="margin-bottom:0">Professor ${i+1}</div>
+      ${loteProfessores.length>1?`<button type="button" class="btn-sm" style="color:#A32D2D" onclick="removerProfessorLote(${i})">Remover</button>`:''}
+    </div>
+    <div class="field">
+      <label>Nome completo<span class="req">*</span></label>
+      <input type="text" value="${(p.prof||'').replace(/"/g,'&quot;')}" oninput="atualizarCampoLote(${i},'prof',this.value)" placeholder="Nome completo"/>
+    </div>
+    <div class="row2">
+      <div class="field">
+        <label>Matrícula<span class="req">*</span></label>
+        <input type="text" value="${(p.mat||'').replace(/"/g,'&quot;')}" oninput="atualizarCampoLote(${i},'mat',this.value)" placeholder="Matrícula"/>
+      </div>
+      <div class="field">
+        <label>WhatsApp<span class="req">*</span></label>
+        <input type="tel" value="${(p.wpp||'').replace(/"/g,'&quot;')}" maxlength="15" oninput="mascaraTel(this);atualizarCampoLote(${i},'wpp',this.value)" placeholder="(XX) XXXXX-XXXX"/>
+      </div>
+    </div>
+    <div class="field">
+      <label>Escola de lotação (maior carga horária)<span class="req">*</span></label>
+      <select onchange="atualizarCampoLote(${i},'escola',this.value)" data-lote-escola="${i}">
+        <option value="">Selecione a escola...</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>Já tem cadastro no SIAGE?<span class="req">*</span></label>
+      <div class="radio-group">
+        <label class="ropt ${p.siage==='sim'?'sel':''}" onclick="selRLote(${i},'siage','sim')"><input type="radio">Sim</label>
+        <label class="ropt ${p.siage==='nao'?'sel':''}" onclick="selRLote(${i},'siage','nao')"><input type="radio">Não</label>
+      </div>
+    </div>
+    ${p.siage==='nao'?`
+    <div style="background:#FDEAEA;border:1px solid #f7c1c1;border-radius:12px;padding:1rem;margin-bottom:.875rem">
+      <div style="font-size:13px;font-weight:500;color:#A32D2D;margin-bottom:.5rem">Cadastro no SIAGE obrigatório</div>
+      <p style="font-size:12px;color:#7a2020;line-height:1.6">Este professor precisa ter cadastro ativo no SIAGE antes de entrar no lote. Remova-o do lote (o formulário individual de Acesso resolve isso primeiro) ou volte aqui depois de criado.</p>
+    </div>`:''}
+    ${p.siage==='sim'?`
+    <div class="field">
+      <label>É professor(a) de disciplina técnica em ECIT?<span class="req">*</span></label>
+      <div class="radio-group">
+        <label class="ropt ${p.ecitLot==='sim'?'sel':''}" onclick="selRLote(${i},'ecitLot','sim')"><input type="radio">Sim</label>
+        <label class="ropt ${p.ecitLot==='nao'?'sel':''}" onclick="selRLote(${i},'ecitLot','nao')"><input type="radio">Não</label>
+      </div>
+    </div>
+    <div class="field">
+      <label>Complementa carga horária em outra escola?<span class="req">*</span></label>
+      <div class="radio-group">
+        <label class="ropt ${p.comp==='sim'?'sel':''}" onclick="selRLote(${i},'comp','sim')"><input type="radio">Sim</label>
+        <label class="ropt ${p.comp==='nao'?'sel':''}" onclick="selRLote(${i},'comp','nao')"><input type="radio">Não</label>
+      </div>
+    </div>
+    ${p.comp==='sim'?`<div class="field">
+      <label>Escola de complementação<span class="req">*</span></label>
+      <select onchange="atualizarCampoLote(${i},'escolaComp',this.value)" data-lote-escola-comp="${i}">
+        <option value="">Selecione a escola...</option>
+      </select>
+    </div>`:''}
+    <div class="field">
+      <label>Se afastou com licença nos últimos 6 meses?<span class="req">*</span></label>
+      <div class="radio-group">
+        <label class="ropt ${p.licenca==='sim'?'sel':''}" onclick="selRLote(${i},'licenca','sim')"><input type="radio">Sim</label>
+        <label class="ropt ${p.licenca==='nao'?'sel':''}" onclick="selRLote(${i},'licenca','nao')"><input type="radio">Não</label>
+      </div>
+      ${p.licenca==='sim'?`<div class="alerta" style="display:block;margin-top:8px">⚠️ <strong>Atenção:</strong> professores em licença têm o acesso ao SIAGE bloqueado automaticamente. A liberação ocorre só após comunicação oficial da escola.</div>`:''}
+    </div>
+    <div class="field">
+      <label>Mudou de escola nos últimos 6 meses?<span class="req">*</span></label>
+      <div class="radio-group">
+        <label class="ropt ${p.mudou==='sim'?'sel':''}" onclick="selRLote(${i},'mudou','sim')"><input type="radio">Sim</label>
+        <label class="ropt ${p.mudou==='nao'?'sel':''}" onclick="selRLote(${i},'mudou','nao')"><input type="radio">Não</label>
+      </div>
+    </div>
+    ${p.mudou==='sim'?`<div class="field">
+      <label>Escola de origem (escola anterior)<span class="req">*</span></label>
+      <select onchange="atualizarCampoLote(${i},'escolaOrigem',this.value)" data-lote-escola-origem="${i}">
+        <option value="">Selecione a escola...</option>
+      </select>
+      <div style="background:#FEF9EC;border:1px solid #F5D97A;border-radius:8px;padding:10px 13px;font-size:12px;color:#7a5c10;line-height:1.6;margin-top:6px">
+        ⚠️ Para a lotação ser realizada, o processo de remoção precisa ter sido comunicado ao SGMOP.
+      </div>
+    </div>`:''}
+    <div class="field">
+      <label>Documentos obrigatórios: Quadro Escolar + Diplomas<span class="req">*</span></label>
+      <div class="file-area" id="lote-fa-${i}" onclick="document.getElementById('lote-file-${i}').click()">
+        Clique para selecionar arquivos (PDF, JPG ou PNG)
+        <input type="file" id="lote-file-${i}" accept=".pdf,.jpg,.jpeg,.png" multiple onchange="selecionarArquivosLote(this,${i})" style="display:none"/>
+      </div>
+      <div id="lote-arquivos-${i}" style="display:none"></div>
+    </div>
+    `:''}
+    <button type="button" class="btn-sm" style="width:100%;margin-top:.5rem" onclick="colapsarProfessorLote(${i})">Concluir e recolher este professor</button>
+  </div>`;
+}
+
+function atualizarCampoLote(idx, campo, valor){
+  loteProfessores[idx][campo]=valor;
+}
+
+function selRLote(idx, grupo, valor){
+  loteProfessores[idx][grupo]=valor;
+  const bloco=document.getElementById('lote-bloco-'+idx);
+  if(bloco){
+    bloco.outerHTML=renderBlocoProfessorLote(loteProfessores[idx], idx);
+    popularSelectsEscolaLote();
+    renderArquivosLote(idx);
+  }
+}
+
+function editarProfessorLote(idx){
+  loteProfessores.forEach((p,i)=>p.expandido=(i===idx));
+  renderBlocosLote();
+  setTimeout(()=>{
+    const el=document.getElementById('lote-bloco-'+idx);
+    if(el) el.scrollIntoView({behavior:'smooth',block:'start'});
+  },50);
+}
+
+function colapsarProfessorLote(idx){
+  loteProfessores[idx].expandido=false;
+  renderBlocosLote();
+}
+
+function adicionarProfessorLote(){
+  if(loteProfessores.length>=LOTE_MAX){
+    alert('Você pode adicionar no máximo '+LOTE_MAX+' professores por solicitação. Envie esse lote e, se precisar, crie uma nova solicitação para os demais.');
+    return;
+  }
+  loteProfessores.forEach(p=>p.expandido=false);
+  loteProfessores.push(novoProfessorLote());
+  renderBlocosLote();
+  const novoIdx=loteProfessores.length-1;
+  setTimeout(()=>{
+    const el=document.getElementById('lote-bloco-'+novoIdx);
+    if(el) el.scrollIntoView({behavior:'smooth',block:'start'});
+  },50);
+}
+
+function removerProfessorLote(idx){
+  if(loteProfessores.length<=1){
+    alert('É necessário ter pelo menos um professor no lote.');
+    return;
+  }
+  if(!confirm('Remover este professor do lote?')) return;
+  loteProfessores.splice(idx,1);
+  if(!loteProfessores.some(p=>p.expandido)) loteProfessores[loteProfessores.length-1].expandido=true;
+  renderBlocosLote();
+}
+
+function renderArquivosLote(idx){
+  const box=document.getElementById('lote-arquivos-'+idx);
+  const fa=document.getElementById('lote-fa-'+idx);
+  if(!box||!fa) return;
+  const arqs=loteProfessores[idx].arquivos;
+  if(arqs.length===0){
+    box.style.display='none'; box.innerHTML='';
+    fa.classList.remove('has-file');
+    fa.childNodes[0].textContent='Clique para selecionar arquivos (PDF, JPG ou PNG)';
+    return;
+  }
+  fa.classList.add('has-file');
+  fa.childNodes[0].textContent=arqs.length+' arquivo(s) selecionado(s)';
+  box.style.display='flex'; box.style.flexWrap='wrap'; box.style.gap='6px'; box.style.marginTop='6px';
+  box.innerHTML=arqs.map((f,fi)=>`
+    <span style="display:inline-flex;align-items:center;gap:5px;background:#EBF3FB;color:#185FA5;border-radius:20px;padding:3px 6px 3px 10px;font-size:12px;max-width:100%">
+      <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:200px">${f.name}</span>
+      <button type="button" onclick="removerArquivoLote(${idx},${fi})" title="Remover" style="background:#185FA5;color:#fff;border:none;border-radius:50%;width:16px;height:16px;min-width:16px;font-size:11px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0">✕</button>
+    </span>`).join('');
+}
+
+function selecionarArquivosLote(inp, idx){
+  loteProfessores[idx].arquivos=Array.from(inp.files);
+  renderArquivosLote(idx);
+}
+
+function removerArquivoLote(idx, fileIdx){
+  loteProfessores[idx].arquivos.splice(fileIdx,1);
+  renderArquivosLote(idx);
+  const fileInp=document.getElementById('lote-file-'+idx);
+  if(fileInp) fileInp.value='';
+}
+
+function validarBlocoLote(p){
+  const erros=[];
+  if(!p.prof||!p.prof.trim()) erros.push('nome');
+  if(!p.mat||!p.mat.trim()) erros.push('matrícula');
+  if(!p.wpp||p.wpp.replace(/\D/g,'').length<10) erros.push('WhatsApp válido');
+  if(!p.escola) erros.push('escola de lotação');
+  if(!p.siage) erros.push('resposta sobre cadastro no SIAGE');
+  if(p.siage==='nao') erros.push('cadastro no SIAGE ainda pendente — remova este professor do lote por enquanto');
+  if(p.siage==='sim'){
+    if(!p.ecitLot) erros.push('resposta sobre ECIT');
+    if(!p.comp) erros.push('resposta sobre complementação de carga horária');
+    if(p.comp==='sim'&&!p.escolaComp) erros.push('escola de complementação');
+    if(!p.licenca) erros.push('resposta sobre licença');
+    if(!p.mudou) erros.push('resposta sobre mudança de escola');
+    if(p.mudou==='sim'&&!p.escolaOrigem) erros.push('escola de origem');
+    if(p.arquivos.length===0) erros.push('documentos (Quadro Escolar + Diplomas)');
+  }
+  return erros;
+}
+
+function validarLoteCompleto(){
+  const erroEl=document.getElementById('lote-erro-geral');
+  erroEl.style.display='none';
+  for(let i=0;i<loteProfessores.length;i++){
+    const erros=validarBlocoLote(loteProfessores[i]);
+    if(erros.length>0){
+      loteProfessores.forEach((p,j)=>p.expandido=(j===i));
+      renderBlocosLote();
+      erroEl.textContent='Professor '+(i+1)+(loteProfessores[i].prof?' ('+loteProfessores[i].prof+')':'')+': verifique — '+erros.join(', ')+'.';
+      erroEl.style.display='block';
+      setTimeout(()=>{
+        const el=document.getElementById('lote-bloco-'+i);
+        if(el) el.scrollIntoView({behavior:'smooth',block:'start'});
+      },50);
+      return false;
+    }
+  }
+  const mats=loteProfessores.map(p=>(p.mat||'').replace(/\D/g,''));
+  const vistos=new Set();
+  for(let i=0;i<mats.length;i++){
+    if(mats[i]&&vistos.has(mats[i])){
+      erroEl.textContent='Duas ou mais entradas têm a mesma matrícula ('+loteProfessores[i].mat+'). Confira se não houve duplicidade antes de enviar.';
+      erroEl.style.display='block';
+      return false;
+    }
+    vistos.add(mats[i]);
+  }
+  return true;
+}
+
+async function enviarLote(){
+  if(recebimentoBloqueado()){
+    alert('O recebimento de solicitações está temporariamente suspenso. Tente novamente mais tarde ou entre em contato com o NUTCI pelo WhatsApp.');
+    return;
+  }
+  if(!document.getElementById('lote-declaro').checked){
+    alert('Marque a confirmação de que as informações são verdadeiras antes de enviar.');
+    return;
+  }
+  if(!validarLoteCompleto()) return;
+
+  const btn=document.getElementById('btn-enviar-lote');
+  const progEl=document.getElementById('lote-progresso');
+  const erroEl=document.getElementById('lote-erro-geral');
+  erroEl.style.display='none';
+  btn.disabled=true;
+  progEl.style.display='block';
+
+  const loteProtocolo=Date.now();
+  const total=loteProfessores.length;
+  const resultados=[];
+
+  for(let i=0;i<total;i++){
+    const p=loteProfessores[i];
+    progEl.textContent='Enviando professor '+(i+1)+' de '+total+' ('+p.prof+')...';
+    try{
+      const arquivosEnviados=[];
+      for(let fi=0;fi<p.arquivos.length;fi++){
+        progEl.textContent='Enviando documentos — professor '+(i+1)+' de '+total+', arquivo '+(fi+1)+' de '+p.arquivos.length+'...';
+        arquivosEnviados.push(await uploadArquivoCloudinary(p.arquivos[fi]));
+      }
+      const sol={
+        id:loteProtocolo+i, tipo:'lotacao', status:'Pendente', data:new Date().toLocaleString('pt-BR'),
+        quem:'gestor', prof:p.prof, mat:p.mat, wpp:p.wpp, escola:p.escola,
+        siage:p.siage, ecitLot:p.ecitLot, comp:p.comp, escolaComp:p.escolaComp||'',
+        licenca:p.licenca, mudou:p.mudou, escolaOrigem:p.escolaOrigem||'',
+        arquivos:arquivosEnviados, obs:'',
+        loteProtocolo:loteProtocolo, loteIndex:i+1, loteTotal:total,
+      };
+      progEl.textContent='Salvando professor '+(i+1)+' de '+total+' ('+p.prof+')...';
+      const sucesso=await salvarSol(sol);
+      resultados.push({ok:sucesso, idx:i, prof:p.prof});
+    }catch(e){
+      resultados.push({ok:false, idx:i, prof:p.prof, erro:e.message});
+    }
+  }
+
+  btn.disabled=false;
+  progEl.style.display='none';
+
+  const falhas=resultados.filter(r=>!r.ok);
+  if(falhas.length===0){
+    mostrarConclusaoLote(loteProtocolo, resultados);
+  }else{
+    const sucessosIdx=resultados.filter(r=>r.ok).map(r=>r.idx);
+    loteProfessores=loteProfessores.filter((p,i)=>!sucessosIdx.includes(i));
+    loteProfessores.forEach((p,i)=>p.expandido=(i===0));
+    renderBlocosLote();
+    erroEl.innerHTML='⚠ '+falhas.length+' de '+total+' professor(es) não foram enviados (falha de conexão): '+falhas.map(f=>f.prof).join(', ')+'. Quem já foi salvo com sucesso já saiu da lista. Clique em "Enviar solicitação" de novo pra tentar reenviar só quem falta.';
+    erroEl.style.display='block';
+  }
+}
+
+function resetLoteDOM(){
+  const multiplo=document.getElementById('lote-form-multiplo');
+  const individual=document.getElementById('lote-form-individual');
+  const progWrap=document.getElementById('prog-lot-wrap');
+  const bloco=document.getElementById('bloco-lote-pergunta');
+  const declaro=document.getElementById('lote-declaro');
+  const blocosCont=document.getElementById('lote-blocos');
+  if(multiplo) multiplo.classList.add('hidden');
+  if(individual) individual.classList.remove('hidden');
+  if(progWrap) progWrap.classList.remove('hidden');
+  if(bloco) bloco.classList.add('hidden');
+  if(declaro) declaro.checked=false;
+  if(blocosCont) blocosCont.innerHTML='';
+  document.querySelectorAll('#rg-quem .ropt').forEach(o=>o.classList.remove('sel'));
+  delete radios['quem'];
+  modoLote=false;
+  loteProfessores=[];
+}
+
+function mostrarConclusaoLote(loteProtocolo, resultados){
+  document.getElementById('tipo-sel').classList.add('hidden');
+  document.getElementById('form-acesso').classList.add('hidden');
+  document.getElementById('form-lotacao').classList.add('hidden');
+  document.getElementById('conclusao-titulo').textContent='Lote de lotação enviado com sucesso!';
+  document.getElementById('conclusao-msg').innerHTML='Foram registradas '+resultados.length+' solicitações de lotação, vinculadas ao mesmo protocolo:<br>'+resultados.map(r=>'• '+r.prof).join('<br>');
+  document.getElementById('conclusao-protocolo-num').textContent='#'+loteProtocolo;
+  const btnNova=document.getElementById('btn-nova-sol');
+  if(btnNova){ btnNova.textContent='Nova solicitação de lotação'; btnNova.dataset.tipo='lotacao'; }
+  resetLoteDOM();
+  document.getElementById('tela-conclusao').classList.remove('hidden');
+  window.scrollTo({top:0,behavior:'smooth'});
 }
 
 async function enviarLotacao(){
@@ -2032,7 +2478,7 @@ const STATUS_INFO = {
   },
   'Aguardando envio de dados': {
     msg: 'O NUTCI identificou uma pendência na sua solicitação.',
-    proximo: 'Verifique as observações abaixo e, em breve, você poderá responder diretamente por aqui. Por enquanto, acompanhe pelo WhatsApp.',
+    proximo: 'Verifique abaixo o que precisa ser corrigido ou enviado, e responda diretamente por aqui.',
   },
   'Resolvido parcialmente': {
     msg: 'Parte da sua solicitação foi concluída, mas ainda há pendências em andamento.',
@@ -2279,6 +2725,9 @@ async function buscarSolicitacao(){
     const badgeMap={
       'Resolvido':'#E8F5EE|#0F6E56',
       'Resolvido parcialmente':'#EBF3FB|#185FA5',
+      'Solicitação encaminhada à GGEPS':'#EBF3FB|#185FA5',
+      'Solicitação encaminhada ao SGMOP':'#EBF3FB|#185FA5',
+      'Solicitação negada':'#FDEAEA|#A32D2D',
       'Enviado à GGEPS':'#EBF3FB|#185FA5',
       'Enviado ao SGMOP':'#EBF3FB|#185FA5',
       'Negado':'#FDEAEA|#A32D2D',
@@ -2290,6 +2739,21 @@ async function buscarSolicitacao(){
       msg:'Sua solicitação está sendo processada.',
       proximo:'Aguarde o contato do NUTCI pelo WhatsApp.',
     };
+    // Nos status de texto automático (matrícula recente/licença), a observação JÁ
+    // é a mensagem — não repete a msg genérica. Nos demais, mostra msg + observação
+    // (quando houver) dentro do mesmo bloco, em vez de duas caixas separadas.
+    const temObs = s.obs && s.obs.trim();
+    const isAutoTexto = !!STATUS_AUTO_TEXTO[s.status];
+    let corpoInfo;
+    if(isAutoTexto){
+      corpoInfo = temObs ? s.obs : info.msg;
+    } else if(temObs){
+      corpoInfo = info.msg
+        ? `${info.msg}<div style="margin-top:8px;padding-top:8px;border-top:1px solid #e5e5e2">${s.obs}</div>`
+        : s.obs;
+    } else {
+      corpoInfo = info.msg;
+    }
 
     return `<div style="background:#fff;border:1px solid #e0e0e0;border-radius:12px;padding:1rem;margin-bottom:.75rem">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px;margin-bottom:.75rem">
@@ -2304,9 +2768,9 @@ async function buscarSolicitacao(){
         <span style="font-size:11px;color:#aaa">Última atualização: ${s.dataStatus||s.data||'—'}</span>
       </div>
       <div style="background:#f5f5f3;border-radius:8px;padding:.75rem;font-size:13px;line-height:1.6;color:#1a1a1a;margin-bottom:.625rem">
-        ${info.msg}
+        ${corpoInfo}
       </div>
-      <div style="display:flex;gap:8px;align-items:flex-start;margin-bottom:${s.obs||info.upload||(STATUS_NEGADO.includes(s.status)&&s.motivoNegado)?'.75rem':'0'}">
+      <div style="display:flex;gap:8px;align-items:flex-start;margin-bottom:${info.upload||(STATUS_NEGADO.includes(s.status)&&s.motivoNegado)?'.75rem':'0'}">
         <span style="font-size:16px;flex-shrink:0">👉</span>
         <span style="font-size:12px;color:#666;line-height:1.6">${info.proximo}</span>
       </div>
@@ -2321,11 +2785,6 @@ async function buscarSolicitacao(){
         <div id="consulta-upload-ok-${s.id}" style="display:none;font-size:12px;color:#0F6E56"></div>
         <div id="consulta-upload-err-${s.id}" style="display:none;font-size:12px;color:#A32D2D"></div>
       </div>`:''}
-      ${s.obs?`
-      <div style="border-top:1px solid #e0e0e0;padding-top:.625rem;margin-bottom:${STATUS_NEGADO.includes(s.status)&&s.motivoNegado?'.75rem':'0'}">
-        <div style="font-size:11px;font-weight:500;color:#666;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">📋 Observações do NUTCI</div>
-        <div style="font-size:13px;color:#1a1a1a;line-height:1.6">${s.obs}</div>
-      </div>`:''}
       ${STATUS_NEGADO.includes(s.status)&&s.motivoNegado?`
       <div style="border-top:1px solid #f7c1c1;padding-top:.75rem">
         <div style="font-size:11px;font-weight:500;color:#A32D2D;text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px">❌ Motivo da negação</div>
@@ -2339,7 +2798,20 @@ async function buscarSolicitacao(){
     </div>`;
   }).join('');
 
+  // Se os resultados vieram de uma busca por protocolo de lote, todos compartilham
+  // o mesmo loteProtocolo — mostra um cabeçalho explicando o agrupamento.
+  const protocolosUnicos=[...new Set(encontradas.map(s=>s.loteProtocolo).filter(Boolean))];
+  const ehLote=encontradas.length>1 && protocolosUnicos.length===1;
+  const cabecalhoLote=ehLote?`<div style="background:#EBF3FB;border:1px solid #b5d4f4;border-radius:12px;padding:1rem;margin:.875rem 0;display:flex;align-items:center;gap:10px">
+    <span style="font-size:24px">📦</span>
+    <div>
+      <div style="font-weight:700;font-size:14px;color:#185FA5">Lote #${protocolosUnicos[0]} — ${encontradas.length} professor(es)</div>
+      <div style="font-size:12px;color:#666">${encontradas.map(s=>s.nome).join(', ')}</div>
+    </div>
+  </div>`:'';
+
   resultado.innerHTML=`
+    ${cabecalhoLote}
     <div style="font-size:13px;color:#666;margin:.875rem 0 .5rem">${encontradas.length} solicitação(ões) encontrada(s):</div>
     ${cards}`;
 }
@@ -2384,6 +2856,7 @@ async function salvarSol(sol){
 
 function resetForm(){
   radios={};arquivosSelecionados=[];
+  if(typeof resetLoteDOM==='function') resetLoteDOM();
   document.querySelectorAll('.ropt').forEach(o=>o.classList.remove('sel'));
   document.querySelectorAll('input[type=text],input[type=email],input[type=tel],input[type=date],select,textarea').forEach(i=>{if(i.tagName==='SELECT')i.selectedIndex=0;else i.value='';});
   document.querySelectorAll('.alerta').forEach(a=>a.style.display='none');
@@ -2411,7 +2884,7 @@ function resetForm(){
     if(fa.childNodes[0]) fa.childNodes[0].textContent='Clique para selecionar arquivos (PDF, JPG ou PNG)';
   }
   const uploadNomes=document.getElementById('upload-nomes');
-  if(uploadNomes) uploadNomes.style.display='none';
+  if(uploadNomes){ uploadNomes.style.display='none'; uploadNomes.innerHTML=''; }
   ['upload-ok','upload-err','upload-progress'].forEach(id=>{ const el=document.getElementById(id); if(el) el.style.display='none'; });
   const fileDocs=document.getElementById('file-docs');
   if(fileDocs) fileDocs.value='';
@@ -2601,7 +3074,6 @@ const CAMPOS_CORRIGIVEIS={
     {key:'nome',label:'Nome'},
     {key:'mat',label:'Matrícula'},
     {key:'cpf',label:'CPF'},
-    {key:'nasc',label:'Data de nascimento'},
     {key:'funcao',label:'Função'},
     {key:'escola',label:'Escola'},
     {key:'emailInst',label:'E-mail institucional'},
@@ -2719,6 +3191,46 @@ function limparFiltrosPainel(){
   renderCards();
 }
 
+// Agrupa solicitações que compartilham o mesmo loteProtocolo num único "item" pra
+// renderização/paginação — assim um lote nunca fica cortado entre duas páginas.
+function agruparPorLote(sols){
+  const jaProcessado=new Set();
+  const itens=[];
+  sols.forEach(s=>{
+    if(jaProcessado.has(s.id)) return;
+    if(s.loteProtocolo){
+      const membros=sols.filter(x=>x.loteProtocolo===s.loteProtocolo);
+      membros.forEach(m=>jaProcessado.add(m.id));
+      itens.push({tipo:'lote', protocolo:s.loteProtocolo, membros, maxId:Math.max(...membros.map(m=>m.id))});
+    }else{
+      jaProcessado.add(s.id);
+      itens.push({tipo:'individual', sol:s, maxId:s.id});
+    }
+  });
+  itens.sort((a,b)=>b.maxId-a.maxId);
+  return itens;
+}
+
+function renderItemPainel(item){
+  if(item.tipo==='individual') return renderCard(item.sol);
+  const membros=[...item.membros].sort((a,b)=>(a.loteIndex||0)-(b.loteIndex||0));
+  const nomes=membros.map(m=>m.prof||'(sem nome)').join(', ');
+  const totalReal=membros.length;
+  const totalOriginal=membros[0]?.loteTotal||totalReal;
+  const avisoIncompleto=totalReal<totalOriginal
+    ? `<span style="color:#A32D2D;font-weight:600"> (${totalReal} de ${totalOriginal} — algum professor pode ter sido excluído do lote)</span>` : '';
+  return `<div class="lote-grupo" style="border:2px solid #185FA5;border-radius:16px;padding:1rem;margin-bottom:1rem;background:#F7FAFD">
+    <div style="display:flex;align-items:flex-start;gap:8px;margin-bottom:.875rem;flex-wrap:wrap">
+      <span style="font-size:20px;line-height:1">📦</span>
+      <div style="flex:1;min-width:200px">
+        <div style="font-weight:700;font-size:14px;color:#185FA5">Lote #${item.protocolo} — ${totalReal} professor(es)${avisoIncompleto}</div>
+        <div style="font-size:12px;color:#666;margin-top:2px">${nomes}</div>
+      </div>
+    </div>
+    ${membros.map(m=>renderCard(m)).join('')}
+  </div>`;
+}
+
 function renderCards(){
   sincronizarFiltroEscola();
   const busca=(document.getElementById('painel-busca')?.value||'').toLowerCase();
@@ -2749,10 +3261,11 @@ function renderCards(){
     list.innerHTML=`<div class="empty">${_mostrarOcultosPainel?'Nenhum card ocultado no momento.':'Nenhuma solicitação encontrada.'}</div>`;
     return;
   }
-  const totalPag=Math.ceil(sols.length/POR_PAGINA);
+  const itens=agruparPorLote(sols);
+  const totalPag=Math.ceil(itens.length/POR_PAGINA);
   if(_paginaPainel>totalPag) _paginaPainel=1;
-  const fatia=sols.slice((_paginaPainel-1)*POR_PAGINA, _paginaPainel*POR_PAGINA);
-  list.innerHTML=fatia.map(s=>renderCard(s)).join('')+renderPaginacao(sols.length,_paginaPainel,'mudarPaginaPainel','cards-list');
+  const fatia=itens.slice((_paginaPainel-1)*POR_PAGINA, _paginaPainel*POR_PAGINA);
+  list.innerHTML=fatia.map(it=>renderItemPainel(it)).join('')+renderPaginacao(itens.length,_paginaPainel,'mudarPaginaPainel','cards-list');
 }
 
 function renderCard(s){
@@ -2818,7 +3331,7 @@ function renderCard(s){
           ${statusBadge(s.status)}
         </div>
         <div class="card-title">${nome}</div>
-        <div class="card-sub">${s.escola||''} · ${s.data}</div>
+        <div class="card-sub">${s.escola||''} · ${s.data}${s.loteProtocolo?` · <span style="color:#185FA5;font-weight:500">📦 Lote #${s.loteProtocolo} (${s.loteIndex||'?'}/${s.loteTotal||'?'})</span>`:''}</div>
       </div>
     </div>
     <div class="card-body">${renderDados(s)}</div>
@@ -2882,7 +3395,7 @@ function renderDados(s){
       <div class="data-item"><div class="dk">Solicitação</div><div class="dv">${s.solicitacao} · ${s.plataforma}</div></div>
       <div class="data-item"><div class="dk">Matrícula</div><div class="dv">${s.mat}</div></div>
       <div class="data-item"><div class="dk">CPF</div><div class="dv">${s.cpf}</div></div>
-      <div class="data-item"><div class="dk">Nascimento</div><div class="dv">${s.nasc}</div></div>
+      ${s.nasc?`<div class="data-item"><div class="dk">Nascimento</div><div class="dv">${s.nasc}</div></div>`:''}
       <div class="data-item"><div class="dk">Função</div><div class="dv">${s.funcao}</div></div>
       <div class="data-item"><div class="dk">WhatsApp</div><div class="dv">${s.wpp}</div></div>
       <div class="data-item"><div class="dk">E-mail pessoal</div><div class="dv">${s.emailPes}</div></div>
@@ -3047,6 +3560,10 @@ function mudarStatus(id,val){
   // Preenche a observação automaticamente pros status de "aguardar matrícula"
   if(STATUS_AUTO_TEXTO[val]) solicitacoes[idx].obs=STATUS_AUTO_TEXTO[val];
 
+  // "Solicitação negada" usa o campo de motivo, não observação — limpa obs antiga
+  // pra não aparecer duplicado (a mesma explicação em dois lugares) na tela pública
+  if(val==='Solicitação negada') solicitacoes[idx].obs='';
+
   // Sai do status "Aguardando envio de dados" → limpa a pendência (ciclo encerrado)
   if(val!=='Aguardando envio de dados'){
     solicitacoes[idx].pendenciaTipo=null;
@@ -3186,7 +3703,6 @@ function gerarEmail(id, tipo){
     nome:           s.prof||s.nome||'',
     matricula:      s.mat||'',
     cpf:            s.cpf||'',
-    nascimento:     s.nasc||'',
     escola:         s.escola||'',
     escolaComp:     s.escolaComp||'',
     escolaOrigem:   s.escolaOrigem||'[ESCOLA DE ORIGEM]',
