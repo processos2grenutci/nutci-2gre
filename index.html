@@ -45,18 +45,6 @@ body{font-family:system-ui,sans-serif;font-size:14px;color:#1a1a1a;background:#f
 .btn-primary:hover{background:#0C447C}
 .btn-primary:disabled{background:#aaa;cursor:not-allowed}
 
-/* ── BARRA DE PROGRESSO ── */
-.progress-wrap{background:#fff;border:1px solid #e0e0e0;border-radius:12px;padding:.875rem 1rem;margin-bottom:.875rem}
-.progress-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:.5rem}
-.progress-label{font-size:12px;color:#666}
-.progress-pct{font-size:12px;font-weight:600;color:#185FA5}
-.progress-bar-bg{height:6px;background:#f0f0f0;border-radius:3px;overflow:hidden}
-.progress-bar-fill{height:100%;background:#185FA5;border-radius:3px;transition:width .35s ease}
-.progress-steps{display:flex;gap:4px;margin-top:.5rem;flex-wrap:wrap}
-.progress-step{font-size:11px;padding:2px 8px;border-radius:20px;background:#f0f0f0;color:#999}
-.progress-step.done{background:#E8F5EE;color:#0F6E56}
-.progress-step.active{background:#EBF3FB;color:#185FA5;font-weight:500}
-
 .badge{display:inline-block;padding:2px 9px;border-radius:20px;font-size:11px;font-weight:500}
 .badge-wait{background:#FEF9EC;color:#92680A}
 .badge-prog{background:#EBF3FB;color:#185FA5}
@@ -575,17 +563,18 @@ body{font-family:system-ui,sans-serif;font-size:14px;color:#1a1a1a;background:#f
       </button>
     </div>
   </div>
+  <div id="resumo-cards" style="margin-bottom:1rem"></div>
   <div class="filter-bar">
     <input type="text" id="painel-busca" placeholder="Buscar por nome ou matrícula..."
       onkeydown="if(event.key==='Enter') buscarPainel()"
       style="flex:1;min-width:180px;font-family:system-ui,sans-serif;font-size:13px;padding:7px 12px;border:1px solid #e0e0e0;border-radius:20px;outline:none"/>
     <button class="btn-sm" onclick="buscarPainel()">🔍 Buscar</button>
-    <select id="fil-tipo" onchange="sincronizarFiltroStatus();renderCards()">
+    <select id="fil-tipo" onchange="_filtroResumoAtivo=null;sincronizarFiltroStatus();renderCards()">
       <option value="">Todos os tipos</option>
       <option value="acesso">Acesso / E-mail</option>
       <option value="lotacao">Lotação</option>
     </select>
-    <select id="fil-status" onchange="renderCards()">
+    <select id="fil-status" onchange="_filtroResumoAtivo=null;renderCards()">
       <option value="">Todos os status</option>
     </select>
     <select id="fil-escola" onchange="renderCards()">
@@ -3009,14 +2998,84 @@ function mudarPaginaPainel(p){ _paginaPainel=p; renderCards(); window.scrollTo({
 
 let _filtroAguardandoPainel=false;
 let _mostrarOcultosPainel=false;
+let _filtroResumoAtivo=null; // {id, tipo, statuses}
+
+// Status que juntos formam o grupo "Com pendência" nos cards de resumo
+const GRUPO_STATUS_PENDENCIA=['Aguardando envio de dados','Necessário aguardar: Matrícula recente','Necessário aguardar: Matrícula em LICENÇA'];
+
+const RESUMO_CARDS=[
+  {id:'acesso-total',      tipo:'acesso',   statuses:null,                  label:'Total recebidas',              icon:'📥', cor:'#185FA5', bg:'#EBF3FB'},
+  {id:'acesso-resolvido',  tipo:'acesso',   statuses:['Resolvido'],         label:'Resolvidas',                   icon:'✅', cor:'#0F6E56', bg:'#E8F5EE'},
+  {id:'acesso-ggeps',      tipo:'acesso',   statuses:['Solicitação encaminhada à GGEPS'], label:'Aguardando retorno da GGEPS', icon:'📤', cor:'#185FA5', bg:'#EBF3FB'},
+  {id:'acesso-pendencia',  tipo:'acesso',   statuses:GRUPO_STATUS_PENDENCIA, label:'Com pendência',               icon:'⏳', cor:'#92680A', bg:'#FEF9EC'},
+  {id:'acesso-negado',     tipo:'acesso',   statuses:['Solicitação negada'], label:'Negadas',                     icon:'❌', cor:'#A32D2D', bg:'#FDEAEA'},
+  {id:'lot-total',         tipo:'lotacao',  statuses:null,                  label:'Total recebidas',              icon:'📥', cor:'#185FA5', bg:'#EBF3FB'},
+  {id:'lot-resolvido',     tipo:'lotacao',  statuses:['Resolvido'],         label:'Resolvidas',                   icon:'✅', cor:'#0F6E56', bg:'#E8F5EE'},
+  {id:'lot-sgmop',         tipo:'lotacao',  statuses:['Solicitação encaminhada ao SGMOP'], label:'Aguardando retorno do SGMOP', icon:'📤', cor:'#185FA5', bg:'#EBF3FB'},
+  {id:'lot-pendencia',     tipo:'lotacao',  statuses:GRUPO_STATUS_PENDENCIA, label:'Com pendência',               icon:'⏳', cor:'#92680A', bg:'#FEF9EC'},
+  {id:'lot-negado',        tipo:'lotacao',  statuses:['Solicitação negada'], label:'Negadas',                     icon:'❌', cor:'#A32D2D', bg:'#FDEAEA'},
+];
+
+function contarResumoCard(card){
+  return solicitacoes.filter(s=>{
+    if(s.oculto) return false;
+    if(s.tipo!==card.tipo) return false;
+    if(card.statuses && !card.statuses.includes(s.status)) return false;
+    return true;
+  }).length;
+}
+
+function renderResumoCardItem(c){
+  const ativo=_filtroResumoAtivo&&_filtroResumoAtivo.id===c.id;
+  const n=contarResumoCard(c);
+  return `<button type="button" onclick="toggleResumoCard('${c.id}')" style="text-align:left;cursor:pointer;border-radius:12px;padding:.75rem .875rem;border:2px solid ${ativo?c.cor:'transparent'};background:${c.bg};box-shadow:${ativo?'0 2px 8px rgba(0,0,0,.14)':'none'};transform:${ativo?'translateY(-1px)':'none'};transition:all .15s;position:relative;font-family:system-ui,sans-serif">
+    ${ativo?`<span style="position:absolute;top:6px;right:8px;font-size:12px;color:${c.cor};font-weight:700">✓</span>`:''}
+    <div style="font-size:11px;color:${c.cor};font-weight:600;margin-bottom:3px;line-height:1.3">${c.icon} ${c.label}</div>
+    <div style="font-size:24px;font-weight:700;color:${c.cor}">${n}</div>
+  </button>`;
+}
+
+function renderResumoCards(){
+  const cont=document.getElementById('resumo-cards');
+  if(!cont) return;
+  const grupo=(titulo,cards)=>`
+    <div style="margin-bottom:.875rem">
+      <div style="font-size:11px;font-weight:600;color:#666;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">${titulo}</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px">
+        ${cards.map(renderResumoCardItem).join('')}
+      </div>
+    </div>`;
+  cont.innerHTML=
+    grupo('Criação / Recuperação de acesso', RESUMO_CARDS.filter(c=>c.tipo==='acesso'))+
+    grupo('Lotação', RESUMO_CARDS.filter(c=>c.tipo==='lotacao'));
+}
+
+function toggleResumoCard(id){
+  const card=RESUMO_CARDS.find(c=>c.id===id);
+  if(!card) return;
+  if(_filtroResumoAtivo && _filtroResumoAtivo.id===id){
+    _filtroResumoAtivo=null;
+  }else{
+    _filtroResumoAtivo=card;
+    // Reseta os filtros manuais de tipo/status pra não combinar de forma confusa com o card
+    const filTipoEl=document.getElementById('fil-tipo');
+    const filStatusEl=document.getElementById('fil-status');
+    if(filTipoEl) filTipoEl.value='';
+    if(filStatusEl){ sincronizarFiltroStatus(); filStatusEl.value=''; }
+  }
+  _paginaPainel=1;
+  renderCards();
+}
 
 function buscarPainel(){
+  _filtroResumoAtivo=null;
   _paginaPainel=1;
   renderCards();
 }
 
 function toggleFiltroAguardandoPainel(){
   _filtroAguardandoPainel=!_filtroAguardandoPainel;
+  _filtroResumoAtivo=null;
   _paginaPainel=1;
   renderCards();
 }
@@ -3076,6 +3135,7 @@ function limparFiltrosPainel(){
   if(filEscolaEl) filEscolaEl.value='';
   _filtroAguardandoPainel=false;
   _mostrarOcultosPainel=false;
+  _filtroResumoAtivo=null;
   _paginaPainel=1;
   renderCards();
 }
@@ -3122,6 +3182,7 @@ function renderItemPainel(item){
 
 function renderCards(){
   sincronizarFiltroEscola();
+  renderResumoCards();
   const busca=(document.getElementById('painel-busca')?.value||'').toLowerCase();
   const filTipo=document.getElementById('fil-tipo').value;
   const filStatus=document.getElementById('fil-status').value;
@@ -3137,6 +3198,10 @@ function renderCards(){
     if(filStatus&&s.status!==filStatus) return false;
     if(filEscola&&(s.escola||'')!==filEscola) return false;
     if(_filtroAguardandoPainel&&!semAcao(s)) return false;
+    if(_filtroResumoAtivo){
+      if(s.tipo!==_filtroResumoAtivo.tipo) return false;
+      if(_filtroResumoAtivo.statuses && !_filtroResumoAtivo.statuses.includes(s.status)) return false;
+    }
     if(busca){
       const nome=(s.tipo==='lotacao'?s.prof:s.nome||'').toLowerCase();
       const mat=(s.mat||'').toLowerCase();
