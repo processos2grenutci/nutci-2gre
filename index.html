@@ -116,23 +116,6 @@ body{font-family:system-ui,sans-serif;font-size:14px;color:#1a1a1a;background:#f
 .drop-item:first-child{border-radius:8px 8px 0 0}
 .drop-item:last-child{border-radius:0 0 8px 8px}
 .drop-item:only-child{border-radius:8px}
-.geral-table{width:100%;border-collapse:collapse;font-size:13px}
-.geral-table th{text-align:left;padding:8px 12px;font-size:11px;font-weight:500;color:#666;text-transform:uppercase;letter-spacing:.04em;border-bottom:1px solid #e0e0e0;white-space:nowrap}
-.geral-table td{padding:10px 12px;border-bottom:1px solid #f0f0f0;vertical-align:middle}
-.geral-table tr:hover td{background:#f9f9f7;cursor:pointer}
-.geral-table tr:last-child td{border-bottom:none}
-.nome-cell{font-weight:500;color:#1a1a1a}
-.escola-cell{color:#666;font-size:12px;margin-top:2px}
-.tipo-pill{display:inline-block;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:500}
-.tipo-lot{background:#EBF3FB;color:#185FA5}
-.tipo-ac{background:#E8F5EE;color:#0F6E56}
-.resumo-card{background:#fff;border:1px solid #e0e0e0;border-radius:10px;padding:.75rem 1rem;text-align:center}
-.resumo-num{font-size:22px;font-weight:500;color:#1a1a1a}
-.resumo-label{font-size:11px;color:#666;margin-top:2px}
-.acao-rapida{display:flex;gap:6px;flex-wrap:wrap}
-.drawer-field{margin-bottom:.875rem}
-.drawer-field .dk{font-size:12px;color:#666;margin-bottom:2px}
-.drawer-field .dv{font-size:13px;color:#1a1a1a;font-weight:500}
 </style>
 </head>
 <body>
@@ -141,7 +124,6 @@ body{font-family:system-ui,sans-serif;font-size:14px;color:#1a1a1a;background:#f
   <button class="nav-btn active" onclick="showPage('publico',this)">Formulário público</button>
   <button class="nav-btn" onclick="showPage('consulta',this)">🔍 Acompanhar minha solicitação</button>
   <div id="nav-divisor" style="display:none;width:1px;background:#e0e0e0;margin:0 4px;align-self:stretch"></div>
-  <button class="nav-btn hidden" id="nav-geral" onclick="showPage('geral',this)" style="font-size:12px;opacity:.85">Painel geral <span id="badge-novas" style="display:none;background:#E24B4A;color:#fff;border-radius:20px;font-size:11px;font-weight:700;padding:1px 7px;margin-left:4px"></span></button>
   <button class="nav-btn hidden" id="nav-painel" onclick="showPage('painel',this)" style="font-size:12px;opacity:.85">Painel detalhado</button>
   <button class="nav-btn hidden" id="nav-config" onclick="showPage('config',this)" style="font-size:12px;opacity:.85">Configurações</button>
 </div>
@@ -583,59 +565,6 @@ body{font-family:system-ui,sans-serif;font-size:14px;color:#1a1a1a;background:#f
   <div id="consulta-resultado"></div>
 </div>
 
-<!-- PÁGINA GERAL -->
-<div id="page-geral" class="hidden">
-  <div class="header">
-    <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px">
-      <div>
-        <h1>Painel geral</h1>
-        <p>Monitoramento e ações rápidas</p>
-      </div>
-      <button class="btn-sm" id="btn-atualizar-geral" onclick="atualizarPainel('geral')" style="display:flex;align-items:center;gap:5px;padding:6px 12px">
-        🔄 Atualizar
-      </button>
-    </div>
-  </div>
-  <div id="geral-resumo" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;margin-bottom:1.25rem"></div>
-  <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:1rem">
-    <input type="text" id="geral-busca" placeholder="Buscar por nome ou escola..." oninput="renderGeral()" style="flex:1;min-width:180px;font-family:system-ui,sans-serif;font-size:13px;padding:7px 12px;border:1px solid #e0e0e0;border-radius:20px;outline:none"/>
-    <select id="geral-fil-tipo" onchange="renderGeral()" style="font-family:system-ui,sans-serif;font-size:13px;padding:6px 10px;border-radius:20px;border:1px solid #e0e0e0;background:#fff;color:#1a1a1a">
-      <option value="">Todos os tipos</option>
-      <option value="acesso">Acesso / E-mail</option>
-      <option value="lotacao">Lotação</option>
-    </select>
-    <select id="geral-fil-status" onchange="renderGeral()" style="font-family:system-ui,sans-serif;font-size:13px;padding:6px 10px;border-radius:20px;border:1px solid #e0e0e0;background:#fff;color:#1a1a1a">
-      <option value="">Todos os status</option>
-      <option>Pendente</option>
-      <option>Resolvido</option>
-      <option>Aguardando envio completo de dados</option>
-      <option>Enviado à GGEPS</option>
-      <option>Negado pela GGEPS</option>
-      <option>Necessário aguardar: Matrícula recente</option>
-      <option>Necessário aguardar: Matrícula em LICENÇA</option>
-      <option>Pendente (aguardando interação)</option>
-      <option>Aguardando dados completos</option>
-      <option>Enviado ao SGMOP</option>
-      <option>Resolvido parcialmente</option>
-      <option>Negado</option>
-      <option>Solicitar Carteirinha de Autorização</option>
-    </select>
-    <select id="geral-fil-escola" onchange="renderGeral()" style="font-family:system-ui,sans-serif;font-size:13px;padding:6px 10px;border-radius:20px;border:1px solid #e0e0e0;background:#fff;color:#1a1a1a">
-      <option value="">Todas as escolas</option>
-    </select>
-    <button class="btn-sm" onclick="limparFiltrosGeral()">Limpar filtros</button>
-  </div>
-  <div id="geral-tabela"></div>
-  <div id="drawer-overlay" onclick="fecharDrawer()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.3);z-index:200"></div>
-  <div id="drawer" style="display:none;position:fixed;top:0;right:0;width:min(480px,100vw);height:100vh;background:#fff;z-index:201;overflow-y:auto;box-shadow:-4px 0 20px rgba(0,0,0,0.12);padding:1.25rem">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.25rem">
-      <h2 style="font-size:16px;font-weight:500">Detalhes da solicitação</h2>
-      <button class="btn-sm" onclick="fecharDrawer()">Fechar</button>
-    </div>
-    <div id="drawer-content"></div>
-  </div>
-</div>
-
 <!-- PÁGINA PAINEL -->
 <div id="page-painel" class="hidden">
   <div class="header">
@@ -808,7 +737,6 @@ async function carregarListaEscolasArquivo(){
     ESCOLAS_2GRE.sort((a,b)=>a.localeCompare(b,'pt-BR'));
     popularSelectsEscolaFormularios();
     sincronizarFiltroEscola();
-    sincronizarFiltroEscolaGeral();
   }catch(e){
     console.warn('Erro ao carregar escolas.txt:',e.message);
     IDS_SELECT_ESCOLA.forEach(id=>{
@@ -905,19 +833,11 @@ function mostrarErroCarregamento(containerId, pagina){
 }
 
 async function tentarRecarregar(pagina){
-  if(pagina==='geral'){
-    mostrarLoadingGeral(true);
-    const ok=await carregarDoSheets(true);
-    mostrarLoadingGeral(false);
-    if(!ok && solicitacoes.length===0){ mostrarErroCarregamento('geral-tabela','geral'); }
-    else { renderGeral(); }
-  }else{
-    mostrarLoadingPainel(true);
-    const ok=await carregarDoSheets(true);
-    mostrarLoadingPainel(false);
-    if(!ok && solicitacoes.length===0){ mostrarErroCarregamento('cards-list','painel'); }
-    else { sincronizarFiltroStatus(); renderCards(); }
-  }
+  mostrarLoadingPainel(true);
+  const ok=await carregarDoSheets(true);
+  mostrarLoadingPainel(false);
+  if(!ok && solicitacoes.length===0){ mostrarErroCarregamento('cards-list','painel'); }
+  else { sincronizarFiltroStatus(); renderCards(); }
 }
 
 // ══════════════════════════════════════════════
@@ -1101,7 +1021,7 @@ function hashSenha(str){
 }
 
 function mostrarNavAdmin(visivel){
-  ['nav-geral','nav-painel','nav-config'].forEach(id=>{
+  ['nav-painel','nav-config'].forEach(id=>{
     const el=document.getElementById(id);
     if(el) el.classList.toggle('hidden', !visivel);
   });
@@ -1117,8 +1037,8 @@ function tentarEntrarAdmin(){
   if(hashSenha(digitada)===getSenhaHash()){
     _adminAutenticado=true;
     mostrarNavAdmin(true);
-    const btn=document.getElementById('nav-geral');
-    showPage('geral', btn);
+    const btn=document.getElementById('nav-painel');
+    showPage('painel', btn);
   } else {
     alert('Senha incorreta.');
   }
@@ -1206,8 +1126,8 @@ document.addEventListener('keydown', function(e){
     e.preventDefault();
     _adminAutenticado=true;
     mostrarNavAdmin(true);
-    const btn=document.getElementById('nav-geral');
-    showPage('geral',btn);
+    const btn=document.getElementById('nav-painel');
+    showPage('painel',btn);
   }
 });
 // ══════════════════════════════════════════════
@@ -1362,44 +1282,9 @@ function atualizarProgressoLotacao(){
 // ══════════════════════════════════════════════
 //  PAINEL GERAL
 // ══════════════════════════════════════════════
-function getNome(s){return s.tipo==='lotacao'?s.prof:s.nome;}
-function getEscola(s){return s.escola||'—';}
 
-function sincronizarFiltroEscolaGeral(){
-  const sel=document.getElementById('geral-fil-escola');
-  if(!sel) return;
-  const anterior=sel.value;
-  sel.innerHTML='<option value="">Todas as escolas</option>'+
-    ESCOLAS_2GRE.map(e=>`<option value="${e.replace(/"/g,'&quot;')}">${e}</option>`).join('');
-  if(anterior && ESCOLAS_2GRE.includes(anterior)) sel.value=anterior;
-}
 
-function renderGeral(){
-  const busca=(document.getElementById('geral-busca').value||'').toLowerCase();
-  const filTipo=document.getElementById('geral-fil-tipo').value;
-  const filStatus=document.getElementById('geral-fil-status').value;
-  sincronizarFiltroEscolaGeral();
-  const filEscola=document.getElementById('geral-fil-escola').value;
-  let sols=[...solicitacoes].sort((a,b)=>b.id-a.id);
-  if(busca) sols=sols.filter(s=>getNome(s).toLowerCase().includes(busca)||getEscola(s).toLowerCase().includes(busca));
-  if(filTipo) sols=sols.filter(s=>s.tipo===filTipo);
-  if(filStatus) sols=sols.filter(s=>s.status===filStatus);
-  if(filEscola) sols=sols.filter(s=>getEscola(s)===filEscola);
-  renderResumo(sols);
-  renderTabela(sols);
-}
 
-function renderResumo(sols){
-  const total=sols.length;
-  const pendentes=sols.filter(s=>s.status&&(s.status.toLowerCase().includes('pendente')||s.status.toLowerCase().includes('aguardando'))).length;
-  const resolvidos=sols.filter(s=>s.status&&(s.status.toLowerCase().includes('resolvido')||s.status==='Concluído')).length;
-  const enviados=sols.filter(s=>s.status&&(s.status.toLowerCase().includes('enviado'))).length;
-  document.getElementById('geral-resumo').innerHTML=`
-    <div class="resumo-card"><div class="resumo-num">${total}</div><div class="resumo-label">Total</div></div>
-    <div class="resumo-card"><div class="resumo-num" style="color:#92680A">${pendentes}</div><div class="resumo-label">Pendentes</div></div>
-    <div class="resumo-card"><div class="resumo-num" style="color:#185FA5">${enviados}</div><div class="resumo-label">Enviados</div></div>
-    <div class="resumo-card"><div class="resumo-num" style="color:#0F6E56">${resolvidos}</div><div class="resumo-label">Resolvidos</div></div>`;
-}
 
 const STATUS_INICIAL=['Pendente','Pendente (aguardando interação)','Aguardando','Aguardando dados completos','Aguardando envio completo de dados'];
 
@@ -1455,191 +1340,6 @@ function marcarAcaoRealizada(id){
   atualizarDestaqueCard(id);
 }
 
-let _ordemCol='data';
-let _ordemDir='desc';
-
-function ordenarPor(col){
-  if(_ordemCol===col) _ordemDir=_ordemDir==='asc'?'desc':'asc';
-  else { _ordemCol=col; _ordemDir='asc'; }
-  renderGeral();
-}
-
-function iconeOrdem(col){
-  if(_ordemCol!==col) return '<span style="color:#ccc;font-size:10px">⇅</span>';
-  return _ordemDir==='asc'?'<span style="font-size:10px">↑</span>':'<span style="font-size:10px">↓</span>';
-}
-
-function copiarDadosProfessor(id){
-  const s=solicitacoes.find(x=>x.id===id);
-  if(!s) return;
-  const nome=s.tipo==='lotacao'?s.prof:s.nome;
-  const mat=s.mat||'—';
-  const wpp=s.wpp||'—';
-  const texto=`Nome: ${nome}\nMatrícula: ${mat}\nWhatsApp: ${wpp}`;
-  navigator.clipboard.writeText(texto).then(()=>{
-    const btn=document.getElementById('copiar-btn-'+id);
-    if(btn){btn.textContent='✓ Copiado!';setTimeout(()=>btn.textContent='Copiar dados',2000);}
-  });
-}
-
-function renderTabela(sols){
-  const tabela=document.getElementById('geral-tabela');
-  if(sols.length===0){tabela.innerHTML='<div class="empty">Nenhuma solicitação encontrada.</div>';return;}
-
-  // Ordenação
-  sols=[...sols].sort((a,b)=>{
-    let va,vb;
-    if(_ordemCol==='nome'){va=getNome(a).toLowerCase();vb=getNome(b).toLowerCase();}
-    else if(_ordemCol==='status'){va=a.status||'';vb=b.status||'';}
-    else if(_ordemCol==='tipo'){va=a.tipo;vb=b.tipo;}
-    else {va=a.id;vb=b.id;} // data
-    if(va<vb) return _ordemDir==='asc'?-1:1;
-    if(va>vb) return _ordemDir==='asc'?1:-1;
-    return 0;
-  });
-
-  const totalPag=Math.ceil(sols.length/POR_PAGINA);
-  if(_paginaGeral>totalPag) _paginaGeral=1;
-  const fatia=sols.slice((_paginaGeral-1)*POR_PAGINA, _paginaGeral*POR_PAGINA);
-
-  const rows=fatia.map(s=>{
-    const nome=getNome(s);
-    const escola=getEscola(s);
-    const tipo=s.tipo==='lotacao'?'Lotação':'Acesso/E-mail';
-    const tipoCls=s.tipo==='lotacao'?'tipo-lot':'tipo-ac';
-    const badge=statusBadge(s.status);
-    const data=s.data||'—';
-    const obs=s.obs||'';
-    const nova=semAcao(s);
-    return `<tr style="${nova?'background:#FFFBF0;border-left:3px solid #F5D97A;':''}">
-      <td>
-        <div style="display:flex;align-items:center;gap:6px">
-          ${nova?'<span title="Aguardando ação" style="font-size:14px">🔴</span>':''}
-          <div>
-            <div class="nome-cell">${nome}</div>
-            <div class="escola-cell">${escola}</div>
-          </div>
-        </div>
-      </td>
-      <td><span class="tipo-pill ${tipoCls}">${tipo}</span></td>
-      <td>${badge}</td>
-      <td style="color:#666;font-size:12px;white-space:nowrap">${data}</td>
-      <td style="min-width:180px">
-        <textarea
-          id="obs-geral-${s.id}"
-          rows="2"
-          placeholder="Adicionar observação..."
-          style="width:100%;font-family:system-ui,sans-serif;font-size:12px;padding:5px 8px;border:1px solid #e0e0e0;border-radius:8px;resize:vertical;outline:none;color:#1a1a1a;line-height:1.4"
-          onfocus="this.style.borderColor='#185FA5'"
-          onblur="this.style.borderColor='#e0e0e0'"
-        >${obs}</textarea>
-        <div style="display:flex;align-items:center;gap:6px;margin-top:4px">
-          <button class="btn-sm" onclick="salvarObsComFeedback(${s.id},this,'geral')" style="font-size:11px;padding:3px 8px">Salvar</button>
-          <span id="obs-feedback-geral-${s.id}" style="font-size:11px;color:#0F6E56;display:none">✓ Salvo!</span>
-        </div>
-      </td>
-      <td>
-        <div style="display:flex;flex-direction:column;gap:4px">
-          <button class="btn-sm" onclick="irParaPainelDetalhado(${s.id})">Detalhes</button>
-          <button class="btn-sm" id="copiar-btn-${s.id}" onclick="copiarDadosProfessor(${s.id})">Copiar dados</button>
-        </div>
-      </td>
-    </tr>`;
-  }).join('');
-
-  tabela.innerHTML=`<table class="geral-table">
-    <thead><tr>
-      <th style="cursor:pointer" onclick="ordenarPor('nome')">Solicitante ${iconeOrdem('nome')}</th>
-      <th style="cursor:pointer" onclick="ordenarPor('tipo')">Tipo ${iconeOrdem('tipo')}</th>
-      <th style="cursor:pointer" onclick="ordenarPor('status')">Status ${iconeOrdem('status')}</th>
-      <th style="cursor:pointer" onclick="ordenarPor('data')">Data ${iconeOrdem('data')}</th>
-      <th>Observações</th>
-      <th>Ações</th>
-    </tr></thead>
-    <tbody>${rows}</tbody>
-  </table>`+renderPaginacao(sols.length,_paginaGeral,'mudarPaginaGeral','geral-tabela');
-}
-
-function abrirDrawer(id){
-  const s=solicitacoes.find(x=>x.id===id);
-  if(!s) return;
-  const isLot=s.tipo==='lotacao';
-  let campos='';
-  if(isLot){
-    campos+=`<div class="drawer-field"><div class="dk">Professor</div><div class="dv">${s.prof}</div></div>`;
-    campos+=`<div class="drawer-field"><div class="dk">Matrícula</div><div class="dv">${s.mat}</div></div>`;
-    campos+=`<div class="drawer-field"><div class="dk">Escola</div><div class="dv">${s.escola}</div></div>`;
-    campos+=`<div class="drawer-field"><div class="dk">WhatsApp</div><div class="dv">${s.wpp}</div></div>`;
-    campos+=`<div class="drawer-field"><div class="dk">E-mail</div><div class="dv">${s.email}</div></div>`;
-    campos+=`<div class="drawer-field"><div class="dk">Quem preencheu</div><div class="dv">${s.quem}</div></div>`;
-    if(s.comp==='sim') campos+=`<div class="drawer-field"><div class="dk">Escola de complementação</div><div class="dv">${s.escolaComp}</div></div>`;
-    campos+=`<div class="drawer-field"><div class="dk">Tem SIAGE</div><div class="dv">${s.siage==='sim'?'Sim':'Não'}</div></div>`;
-    campos+=`<div class="drawer-field"><div class="dk">Licença recente</div><div class="dv">${s.licenca==='sim'?'Sim':'Não'}</div></div>`;
-    campos+=`<div class="drawer-field"><div class="dk">Mudou de escola</div><div class="dv">${s.mudou==='sim'?'Sim':'Não'}</div></div>`;
-    if(s.arquivos&&s.arquivos.length>0){
-      campos+=`<div class="drawer-field"><div class="dk">Documentos</div><div class="dv">${s.arquivos.map(a=>`<a href="${a.link}" target="_blank" style="color:#185FA5;display:block">${a.nome}</a>`).join('')}</div></div>`;
-    }
-  } else {
-    campos+=`<div class="drawer-field"><div class="dk">Nome</div><div class="dv">${s.nome}</div></div>`;
-    campos+=`<div class="drawer-field"><div class="dk">Matrícula</div><div class="dv">${s.mat}</div></div>`;
-    campos+=`<div class="drawer-field"><div class="dk">CPF</div><div class="dv">${s.cpf}</div></div>`;
-    campos+=`<div class="drawer-field"><div class="dk">Nascimento</div><div class="dv">${s.nasc}</div></div>`;
-    campos+=`<div class="drawer-field"><div class="dk">Escola</div><div class="dv">${s.escola}</div></div>`;
-    campos+=`<div class="drawer-field"><div class="dk">Função</div><div class="dv">${s.funcao}</div></div>`;
-    campos+=`<div class="drawer-field"><div class="dk">Solicitação</div><div class="dv">${s.solicitacao} — ${s.plataforma}</div></div>`;
-    campos+=`<div class="drawer-field"><div class="dk">WhatsApp</div><div class="dv">${s.wpp}</div></div>`;
-    campos+=`<div class="drawer-field"><div class="dk">E-mail pessoal</div><div class="dv">${s.emailPes}</div></div>`;
-    campos+=`<div class="drawer-field"><div class="dk">E-mail institucional</div><div class="dv">${s.emailInst||'—'}</div></div>`;
-  }
-  document.getElementById('drawer-content').innerHTML=`
-    <div style="margin-bottom:1rem">${statusBadge(s.status)}</div>
-    <div style="margin-bottom:1rem;font-size:12px;color:#666">${s.data}</div>
-    ${campos}
-    <div style="border-top:1px solid #e0e0e0;padding-top:1rem;margin-top:1rem">
-      <div style="font-size:12px;color:#666;margin-bottom:6px">Alterar status</div>
-      ${renderStatusSelect(s)}
-    </div>
-    <div style="margin-top:1rem;display:flex;flex-wrap:wrap;gap:6px">
-      ${renderDocDropdown(s)}
-    </div>
-    <div id="drawer-email-${s.id}" style="margin-top:.75rem"></div>`;
-  window._drawerSolId=id;
-  document.getElementById('drawer-overlay').style.display='block';
-  document.getElementById('drawer').style.display='block';
-}
-
-function fecharDrawer(){
-  document.getElementById('drawer-overlay').style.display='none';
-  document.getElementById('drawer').style.display='none';
-  window._drawerSolId=null;
-  renderGeral();
-}
-
-function irParaPainelDetalhado(id){
-  // Navega para o painel detalhado e filtra pelo ID da solicitação
-  const btn=document.querySelector('.nav-btn:nth-child(3)');
-  showPage('painel',btn);
-  // Rola até o card após render
-  setTimeout(()=>{
-    const el=document.getElementById('card-'+id);
-    if(el) el.scrollIntoView({behavior:'smooth',block:'start'});
-    // Destaca o card brevemente
-    if(el){
-      el.style.outline='2px solid #185FA5';
-      el.style.outlineOffset='2px';
-      setTimeout(()=>{el.style.outline='';el.style.outlineOffset='';},1800);
-    }
-  },80);
-}
-
-function limparFiltrosGeral(){
-  document.getElementById('geral-busca').value='';
-  document.getElementById('geral-fil-tipo').value='';
-  document.getElementById('geral-fil-status').value='';
-  document.getElementById('geral-fil-escola').value='';
-  renderGeral();
-}
-
 // ══════════════════════════════════════════════
 //  NAVEGAÇÃO
 // ══════════════════════════════════════════════
@@ -1648,20 +1348,12 @@ async function showPage(p,btn){
     tentarEntrarAdmin();
     return;
   }
-  ['publico','consulta','geral','painel','config'].forEach(x=>{
+  ['publico','consulta','painel','config'].forEach(x=>{
     const el=document.getElementById('page-'+x);
     if(el) el.classList.toggle('hidden',p!==x);
   });
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
-  if(p==='geral'){
-    mostrarLoadingGeral(true);
-    const ok=await carregarDoSheets();
-    mostrarLoadingGeral(false);
-    if(!ok && solicitacoes.length===0){ mostrarErroCarregamento('geral-tabela','geral'); }
-    else { renderGeral(); }
-    marcarComoVisto();
-  }
   if(p==='painel'){
     mostrarLoadingPainel(true);
     const ok=await carregarDoSheets();
@@ -1676,18 +1368,6 @@ async function showPage(p,btn){
   }
 }
 
-function mostrarLoadingGeral(show){
-  let el=document.getElementById('loading-geral');
-  if(!el){
-    el=document.createElement('div');
-    el.id='loading-geral';
-    el.style.cssText='text-align:center;padding:2rem;font-size:13px;color:#666';
-    el.innerHTML='<div style="display:inline-block;width:20px;height:20px;border:2px solid #e0e0e0;border-top-color:#185FA5;border-radius:50%;animation:spin .7s linear infinite;margin-right:8px;vertical-align:middle"></div>Carregando solicitações...';
-    document.getElementById('geral-tabela').parentNode.insertBefore(el, document.getElementById('geral-tabela'));
-  }
-  el.style.display=show?'block':'none';
-  if(show) document.getElementById('geral-tabela').innerHTML='';
-}
 
 function mostrarLoadingPainel(show){
   let el=document.getElementById('loading-painel');
@@ -1893,22 +1573,13 @@ function renderConfigStatus(){
 
 
 async function atualizarPainel(tipo){
-  const btnId=tipo==='geral'?'btn-atualizar-geral':'btn-atualizar-painel';
-  const btn=document.getElementById(btnId);
+  const btn=document.getElementById('btn-atualizar-painel');
   if(btn){ btn.textContent='⏳ Atualizando...'; btn.disabled=true; }
-  if(tipo==='geral'){
-    mostrarLoadingGeral(true);
-    await carregarDoSheets(true); // força ignorando cache
-    mostrarLoadingGeral(false);
-    renderGeral();
-    marcarComoVisto();
-  } else {
-    mostrarLoadingPainel(true);
-    await carregarDoSheets(true); // força ignorando cache
-    mostrarLoadingPainel(false);
-    sincronizarFiltroStatus();
-    renderCards();
-  }
+  mostrarLoadingPainel(true);
+  await carregarDoSheets(true); // força ignorando cache
+  mostrarLoadingPainel(false);
+  sincronizarFiltroStatus();
+  renderCards();
   if(btn){ btn.textContent='🔄 Atualizar'; btn.disabled=false; }
 }
 
@@ -2256,7 +1927,7 @@ async function enviarLotacao(){
   const arquivos=await fazerUpload();
   btn.disabled=false; btn.textContent='Enviar solicitação';
   if(!arquivos) return;
-  const sol={id:Date.now(),tipo:'lotacao',status:'Aguardando',data:new Date().toLocaleString('pt-BR'),
+  const sol={id:Date.now(),tipo:'lotacao',status:'Pendente',data:new Date().toLocaleString('pt-BR'),
     quem:radios['quem']||'Não informado',prof:v('lot-prof'),mat:v('lot-mat'),cpf:v('lot-cpf'),
     wpp:v('lot-wpp'),email:v('lot-email'),escola:v('lot-escola'),
     ecitLot:radios['ecit-lot']||'nao',
@@ -2345,6 +2016,31 @@ const STATUS_INFO = {
     msg: 'Sua solicitação foi recebida e está na fila de análise.',
     proximo: 'Nenhuma ação necessária por enquanto. Aguarde o contato do NUTCI pelo WhatsApp.',
   },
+  'Solicitação encaminhada à GGEPS': {
+    msg: 'Sua solicitação foi encaminhada para a GGEPS, equipe responsável pela criação e recuperação de acessos.',
+    proximo: 'Nenhuma ação necessária. O NUTCI avisará pelo WhatsApp assim que houver retorno.',
+  },
+  'Solicitação encaminhada ao SGMOP': {
+    msg: 'Sua solicitação de lotação foi encaminhada para o SGMOP para processamento no SIAGE.',
+    proximo: 'Nenhuma ação necessária. O NUTCI avisará pelo WhatsApp assim que houver retorno.',
+  },
+  'Solicitação negada': {
+    msg: 'Sua solicitação não pôde ser atendida.',
+    proximo: 'Entre em contato com o NUTCI pelo WhatsApp para entender o motivo e verificar as próximas opções.',
+  },
+  'Aguardando envio de dados': {
+    msg: 'O NUTCI identificou uma pendência na sua solicitação.',
+    proximo: 'Verifique as observações abaixo e, em breve, você poderá responder diretamente por aqui. Por enquanto, acompanhe pelo WhatsApp.',
+  },
+  'Resolvido parcialmente': {
+    msg: 'Parte da sua solicitação foi concluída, mas ainda há pendências em andamento.',
+    proximo: 'Aguarde o contato do NUTCI pelo WhatsApp com mais detalhes.',
+  },
+  'Resolvido': {
+    msg: 'Sua solicitação foi concluída com sucesso!',
+    proximo: 'Você já pode acessar o sistema ou verificar sua lotação. Em caso de dúvidas, entre em contato com o NUTCI (nutci2gre@see.pb.gov.br).',
+  },
+  // ── status antigos — mantidos só pra exibição correta do histórico ──
   'Pendente (aguardando interação)': {
     msg: 'Sua solicitação foi recebida e está na fila de análise.',
     proximo: 'Nenhuma ação necessária por enquanto. Aguarde o contato do NUTCI pelo WhatsApp.',
@@ -2364,14 +2060,6 @@ const STATUS_INFO = {
   'Enviado ao SGMOP': {
     msg: 'Sua solicitação de lotação foi encaminhada para o SGMOP para processamento no SIAGE.',
     proximo: 'Nenhuma ação necessária. O NUTCI avisará pelo WhatsApp assim que houver retorno.',
-  },
-  'Resolvido parcialmente': {
-    msg: 'Parte da sua solicitação foi concluída, mas ainda há pendências em andamento.',
-    proximo: 'Aguarde o contato do NUTCI pelo WhatsApp com mais detalhes.',
-  },
-  'Resolvido': {
-    msg: 'Sua solicitação foi concluída com sucesso!',
-    proximo: 'Você já pode acessar o sistema ou verificar sua lotação. Em caso de dúvidas, entre em contato com o NUTCI (nutci2gre@see.pb.gov.br).',
   },
   'Negado': {
     msg: 'Sua solicitação não pôde ser atendida.',
@@ -2537,7 +2225,7 @@ async function buscarSolicitacao(){
       <div style="background:#f5f5f3;border-radius:8px;padding:.75rem;font-size:13px;line-height:1.6;color:#1a1a1a;margin-bottom:.625rem">
         ${info.msg}
       </div>
-      <div style="display:flex;gap:8px;align-items:flex-start;margin-bottom:${s.obs||info.upload||((s.status==='Negado'||s.status==='Negado pela GGEPS')&&s.motivoNegado)?'.75rem':'0'}">
+      <div style="display:flex;gap:8px;align-items:flex-start;margin-bottom:${s.obs||info.upload||(STATUS_NEGADO.includes(s.status)&&s.motivoNegado)?'.75rem':'0'}">
         <span style="font-size:16px;flex-shrink:0">👉</span>
         <span style="font-size:12px;color:#666;line-height:1.6">${info.proximo}</span>
       </div>
@@ -2553,11 +2241,11 @@ async function buscarSolicitacao(){
         <div id="consulta-upload-err-${s.id}" style="display:none;font-size:12px;color:#A32D2D"></div>
       </div>`:''}
       ${s.obs?`
-      <div style="border-top:1px solid #e0e0e0;padding-top:.625rem;margin-bottom:${(s.status==='Negado'||s.status==='Negado pela GGEPS')&&s.motivoNegado?'.75rem':'0'}">
+      <div style="border-top:1px solid #e0e0e0;padding-top:.625rem;margin-bottom:${STATUS_NEGADO.includes(s.status)&&s.motivoNegado?'.75rem':'0'}">
         <div style="font-size:11px;font-weight:500;color:#666;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">📋 Observações do NUTCI</div>
         <div style="font-size:13px;color:#1a1a1a;line-height:1.6">${s.obs}</div>
       </div>`:''}
-      ${(s.status==='Negado'||s.status==='Negado pela GGEPS')&&s.motivoNegado?`
+      ${STATUS_NEGADO.includes(s.status)&&s.motivoNegado?`
       <div style="border-top:1px solid #f7c1c1;padding-top:.75rem">
         <div style="font-size:11px;font-weight:500;color:#A32D2D;text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px">❌ Motivo da negação</div>
         <div style="font-size:13px;color:#7a2020;line-height:1.6">${s.motivoNegado}</div>
@@ -2571,20 +2259,7 @@ async function buscarSolicitacao(){
 }
 
 // ── Badge de novas solicitações ────────────────
-function atualizarBadgeNovas(){
-  const visto=parseInt(localStorage.getItem('nutci_visto')||'0');
-  const novas=solicitacoes.filter(s=>s.id>visto).length;
-  const badge=document.getElementById('badge-novas');
-  if(!badge) return;
-  if(novas>0){ badge.textContent=novas; badge.style.display='inline-block'; }
-  else badge.style.display='none';
-}
 
-function marcarComoVisto(){
-  if(solicitacoes.length===0) return;
-  salvarLocalSeguro('nutci_visto', String(solicitacoes[0].id));
-  atualizarBadgeNovas();
-}
 
 // ── Bloqueio de recebimento ────────────────────
 function recebimentoBloqueado(){
@@ -2618,7 +2293,6 @@ function renderBloqueioStatus(){
 async function salvarSol(sol){
   solicitacoes.unshift(sol);
   salvarSolicitacoesLocal();
-  atualizarBadgeNovas();
   return await enviarParaSheets(sol); // devolve true só se o servidor confirmou o recebimento
 }
 
@@ -2674,19 +2348,26 @@ function resetForm(){
 // ══════════════════════════════════════════════
 function statusBadge(s){
   const m={
-    'Aguardando':'badge-wait','Em análise':'badge-prog','Pendente':'badge-pend','Concluído':'badge-done',
+    'Pendente':'badge-pend',
+    'Solicitação encaminhada à GGEPS':'badge-prog',
+    'Solicitação encaminhada ao SGMOP':'badge-prog',
+    'Solicitação negada':'badge-pend',
+    'Necessário aguardar: Matrícula recente':'badge-wait',
+    'Necessário aguardar: Matrícula em LICENÇA':'badge-wait',
+    'Aguardando envio de dados':'badge-wait',
+    'Resolvido':'badge-done',
+    'Resolvido parcialmente':'badge-prog',
+    // status antigos — mantidos só pra exibição correta do histórico
+    'Aguardando':'badge-wait','Em análise':'badge-prog','Concluído':'badge-done',
     'Pendente (aguardando interação)':'badge-pend',
     'Aguardando dados completos':'badge-wait',
+    'Aguardando documentos de remoção':'badge-pend',
     'Enviado ao SGMOP':'badge-prog',
-    'Resolvido parcialmente':'badge-prog',
-    'Resolvido':'badge-done',
     'Negado':'badge-pend',
     'Solicitar Carteirinha de Autorização':'badge-wait',
     'Aguardando envio completo de dados':'badge-wait',
     'Enviado à GGEPS':'badge-prog',
     'Negado pela GGEPS':'badge-pend',
-    'Necessário aguardar: Matrícula recente':'badge-wait',
-    'Necessário aguardar: Matrícula em LICENÇA':'badge-wait'
   };
   return '<span class="badge '+(m[s]||'badge-wait')+'">'+s+'</span>';
 }
@@ -2792,57 +2473,78 @@ window.addEventListener('online', tentarReenviarFila);
 setInterval(tentarReenviarFila, 2*60*1000);
 
 // Status por tipo — fonte única de verdade
-const STATUS_ACESSO=[
+// ══════════════════════════════════════════════
+//  STATUS — menu unificado (mesma lista pra acesso e lotação)
+// ══════════════════════════════════════════════
+const STATUS_UNIFICADO=[
   'Pendente',
-  'Aguardando envio completo de dados',
-  'Enviado à GGEPS',
-  'Negado pela GGEPS',
+  'Solicitação encaminhada à GGEPS',
+  'Solicitação encaminhada ao SGMOP',
+  'Solicitação negada',
   'Necessário aguardar: Matrícula recente',
   'Necessário aguardar: Matrícula em LICENÇA',
+  'Aguardando envio de dados',
   'Resolvido',
-];
-const STATUS_LOTACAO=[
-  'Pendente (aguardando interação)',
-  'Aguardando dados completos',
-  'Aguardando documentos de remoção',
-  'Enviado ao SGMOP',
   'Resolvido parcialmente',
-  'Solicitar Carteirinha de Autorização',
-  'Negado',
-  'Resolvido',
 ];
+
+// Texto automático preenchido na observação quando esses status são escolhidos
+const STATUS_AUTO_TEXTO={
+  'Necessário aguardar: Matrícula recente':
+    'Professor(a), sua matrícula ainda não está disponível nos sistemas. Se você foi recém-empossado(a), por favor aguarde a emissão do seu 1º contracheque.',
+  'Necessário aguardar: Matrícula em LICENÇA':
+    'Professor(a), sua matrícula consta EM LICENÇA em nossos sistemas. Caso tenha retornado de licença recentemente, entre em contato com o NUAFS da 2ª GRE para mais orientações.',
+};
+
+// Status em que o campo de observação aparece pro admin preencher
+const STATUS_MOSTRA_OBS=[
+  'Solicitação encaminhada à GGEPS',
+  'Solicitação encaminhada ao SGMOP',
+  'Resolvido',
+  'Resolvido parcialmente',
+  'Necessário aguardar: Matrícula recente',
+  'Necessário aguardar: Matrícula em LICENÇA',
+];
+
+// Status (novos e antigos, pra manter histórico legível) que abrem o campo de motivo
+const STATUS_NEGADO=['Solicitação negada','Negado','Negado pela GGEPS'];
+
+// Campos que o admin pode pedir correção — chave bate com o campo salvo em cada solicitação
+const CAMPOS_CORRIGIVEIS={
+  acesso:[
+    {key:'nome',label:'Nome'},
+    {key:'mat',label:'Matrícula'},
+    {key:'cpf',label:'CPF'},
+    {key:'nasc',label:'Data de nascimento'},
+    {key:'funcao',label:'Função'},
+    {key:'escola',label:'Escola'},
+    {key:'emailInst',label:'E-mail institucional'},
+    {key:'wpp',label:'WhatsApp'},
+    {key:'emailPes',label:'E-mail pessoal'},
+  ],
+  lotacao:[
+    {key:'prof',label:'Nome do professor'},
+    {key:'mat',label:'Matrícula'},
+    {key:'cpf',label:'CPF'},
+    {key:'wpp',label:'WhatsApp'},
+    {key:'email',label:'E-mail'},
+    {key:'escola',label:'Escola'},
+    {key:'escolaComp',label:'Escola de complementação'},
+    {key:'escolaOrigem',label:'Escola de origem'},
+  ]
+};
 
 function sincronizarFiltroStatus(){
-  const tipo=document.getElementById('fil-tipo').value;
   const sel=document.getElementById('fil-status');
   const anterior=sel.value;
-  sel.innerHTML='';
-
-  if(tipo==='acesso'){
-    sel.innerHTML='<option value="">Todos os status</option>'+
-      STATUS_ACESSO.map(s=>`<option value="${s}">${s}</option>`).join('');
-  } else if(tipo==='lotacao'){
-    sel.innerHTML='<option value="">Todos os status</option>'+
-      STATUS_LOTACAO.map(s=>`<option value="${s}">${s}</option>`).join('');
-  } else {
-    // Todos os tipos — agrupa por tipo com optgroup
-    sel.innerHTML=`<option value="">Todos os status</option>
-      <optgroup label="── Acesso / E-mail">
-        ${STATUS_ACESSO.map(s=>`<option value="${s}">${s}</option>`).join('')}
-      </optgroup>
-      <optgroup label="── Lotação">
-        ${STATUS_LOTACAO.filter(s=>!STATUS_ACESSO.includes(s)).map(s=>`<option value="${s}">${s}</option>`).join('')}
-      </optgroup>`;
-  }
-
-  // Restaura seleção anterior se ainda válida
+  sel.innerHTML='<option value="">Todos os status</option>'+
+    STATUS_UNIFICADO.map(s=>`<option value="${s}">${s}</option>`).join('');
   if(anterior && [...sel.options].some(o=>o.value===anterior)){
     sel.value=anterior;
   }
 }
 
 // Paginação
-let _paginaGeral=1;
 let _paginaPainel=1;
 const POR_PAGINA=30;
 
@@ -2856,7 +2558,6 @@ function renderPaginacao(total, pagAtual, onClickFn, containerId){
   return `<div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:center;padding:.75rem 0;margin-top:.5rem">${btns}</div>`;
 }
 
-function mudarPaginaGeral(p){ _paginaGeral=p; renderGeral(); window.scrollTo({top:0,behavior:'smooth'}); }
 function mudarPaginaPainel(p){ _paginaPainel=p; renderCards(); window.scrollTo({top:0,behavior:'smooth'}); }
 
 let _filtroAguardandoPainel=false;
@@ -3039,14 +2740,15 @@ function renderCard(s){
     ${docsHtml}
     <div class="card-actions">
       ${renderStatusSelect(s)}
-      ${s.status==='Negado'?`<div style="margin-top:6px"><input type="text" placeholder="Motivo da negação..." value="${s.motivoNegado||''}" onchange="salvarMotivo(${s.id},this.value)" style="font-size:12px;padding:5px 10px;border:1px solid #e0e0e0;border-radius:8px;width:100%;font-family:system-ui,sans-serif"/></div>`:''}
+      ${STATUS_NEGADO.includes(s.status)?`<div style="margin-top:6px"><input type="text" placeholder="Motivo da negação..." value="${s.motivoNegado||''}" onchange="salvarMotivo(${s.id},this.value)" style="font-size:12px;padding:5px 10px;border:1px solid #e0e0e0;border-radius:8px;width:100%;font-family:system-ui,sans-serif"/></div>`:''}
+      ${s.status==='Aguardando envio de dados'?renderPendenciaForm(s):''}
       ${renderDocDropdown(s)}
       ${_mostrarOcultosPainel
         ? `<button class="btn-sm" style="color:#185FA5" onclick="restaurarCard(${s.id})">↩ Restaurar</button>`
         : `<button class="btn-sm" onclick="ocultarCard(${s.id})">🙈 Ocultar</button>`}
       <button class="btn-sm" style="color:#A32D2D" onclick="excluir(${s.id})">Excluir</button>
     </div>
-    <div style="border-top:1px solid #e0e0e0;padding-top:.75rem;margin-top:.75rem">
+    ${(s.obs||STATUS_MOSTRA_OBS.includes(s.status))?`<div style="border-top:1px solid #e0e0e0;padding-top:.75rem;margin-top:.75rem">
       <div style="font-size:11px;font-weight:500;color:#666;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">Observações</div>
       <textarea
         id="obs-card-${s.id}"
@@ -3060,7 +2762,7 @@ function renderCard(s){
         <button class="btn-sm primary" onclick="salvarObsComFeedback(${s.id},this)">Salvar observação</button>
         <span id="obs-feedback-${s.id}" style="font-size:12px;color:#0F6E56;display:none">✓ Salvo!</span>
       </div>
-    </div>
+    </div>`:''}
     <div class="email-modal" id="email-${s.id}"></div>
   </div>`;
 }
@@ -3143,18 +2845,10 @@ function renderDocDropdown(s){
 }
 
 function renderStatusSelect(s){
-  const statusAcesso=[
-    'Pendente','Resolvido','Aguardando envio completo de dados',
-    'Enviado à GGEPS','Negado pela GGEPS',
-    'Necessário aguardar: Matrícula recente','Necessário aguardar: Matrícula em LICENÇA'
-  ];
-  const statusLotacao=[
-    'Pendente (aguardando interação)','Aguardando dados completos',
-    'Enviado ao SGMOP','Resolvido parcialmente','Resolvido',
-    'Negado','Solicitar Carteirinha de Autorização'
-  ];
-  const lista=s.tipo==='acesso'?statusAcesso:statusLotacao;
-  const opts=lista.map(st=>`<option ${s.status===st?'selected':''}>${st}</option>`).join('');
+  // Se o status atual não está mais na lista (status antigo/legado), mostra ele mesmo
+  // assim no topo — só pra exibição, ele desaparece assim que o admin trocar de status.
+  const extra = STATUS_UNIFICADO.includes(s.status) ? '' : `<option selected>${s.status}</option>`;
+  const opts = extra + STATUS_UNIFICADO.map(st=>`<option ${s.status===st?'selected':''}>${st}</option>`).join('');
   return `<select onchange="mudarStatus(${s.id},this.value)" style="font-family:system-ui,sans-serif;font-size:12px;padding:4px 8px;border-radius:20px;border:1px solid #e0e0e0;background:#fff;color:#1a1a1a">${opts}</select>`;
 }
 
@@ -3165,6 +2859,73 @@ function salvarMotivo(id,val){
   solicitacoes[idx].acaoRealizada=true;
   sincronizarAtualizacao(solicitacoes[idx]);
   atualizarDestaqueCard(id);
+}
+
+// ── Pendência (sub-modo do status "Aguardando envio de dados") ──
+function renderPendenciaForm(s){
+  const campos = CAMPOS_CORRIGIVEIS[s.tipo]||[];
+  const tipoPend = s.pendenciaTipo||'';
+  const campoAtual = s.pendenciaCampo||'';
+  const campoOpts = campos.map(c=>`<option value="${c.key}" ${campoAtual===c.key?'selected':''}>${c.label}</option>`).join('');
+  const valorAtual = campoAtual ? (s[campoAtual]??'') : '';
+  return `<div id="pend-block-${s.id}" style="margin-top:8px;padding:10px;background:#FEF9EC;border:1px solid #F5D97A;border-radius:8px">
+    <div style="font-size:12px;font-weight:600;color:#92680A;margin-bottom:6px">Pendência para o solicitante</div>
+    <select id="pend-tipo-${s.id}" onchange="mudarTipoPendencia(${s.id},this.value)" style="width:100%;margin-bottom:6px;font-size:12px;padding:5px 8px;border-radius:6px;border:1px solid #e0e0e0;font-family:system-ui,sans-serif">
+      <option value="">Selecione o tipo de pendência...</option>
+      <option value="campo" ${tipoPend==='campo'?'selected':''}>Correção de campo</option>
+      <option value="documento" ${tipoPend==='documento'?'selected':''}>Envio de documentação</option>
+    </select>
+    ${tipoPend==='campo'?`
+    <select id="pend-campo-${s.id}" onchange="atualizarValorAtualPendencia(${s.id},this.value)" style="width:100%;margin-bottom:6px;font-size:12px;padding:5px 8px;border-radius:6px;border:1px solid #e0e0e0;font-family:system-ui,sans-serif">
+      <option value="">Selecione o campo...</option>
+      ${campoOpts}
+    </select>
+    ${campoAtual?`<div id="pend-valor-atual-${s.id}" style="font-size:11px;color:#92680A;margin-bottom:6px">Valor atual: ${valorAtual||'(vazio)'}</div>`:''}`:''}
+    <textarea id="pend-obs-${s.id}" placeholder="${tipoPend==='documento'?'Descreva o documento necessário (ex: quadro atualizado, novo diploma)...':'Observação (opcional)...'}" style="width:100%;min-height:50px;font-size:12px;padding:6px 8px;border-radius:6px;border:1px solid #e0e0e0;font-family:system-ui,sans-serif;margin-bottom:6px;resize:vertical">${s.pendenciaObs||''}</textarea>
+    <button class="btn-sm primary" onclick="salvarPendencia(${s.id})" style="width:100%">Salvar pendência</button>
+    ${s.pendenciaRespondida?'<div style="margin-top:6px;font-size:11px;color:#0F6E56;font-weight:600">✓ O solicitante já respondeu — revise e mude o status quando estiver ok.</div>':''}
+  </div>`;
+}
+
+// Troca o tipo de pendência (campo/documento) sem sincronizar ainda — só re-renderiza
+// o bloco pra mostrar/esconder o seletor de campo. Sincroniza só ao clicar "Salvar".
+function mudarTipoPendencia(id, val){
+  const idx=solicitacoes.findIndex(s=>s.id===id);
+  if(idx===-1) return;
+  solicitacoes[idx].pendenciaTipo=val;
+  const bloco=document.getElementById('pend-block-'+id);
+  if(bloco) bloco.outerHTML=renderPendenciaForm(solicitacoes[idx]);
+}
+
+function atualizarValorAtualPendencia(id, campo){
+  const idx=solicitacoes.findIndex(s=>s.id===id);
+  if(idx===-1) return;
+  solicitacoes[idx].pendenciaCampo=campo;
+  const bloco=document.getElementById('pend-block-'+id);
+  if(bloco) bloco.outerHTML=renderPendenciaForm(solicitacoes[idx]);
+}
+
+function salvarPendencia(id){
+  const idx=solicitacoes.findIndex(s=>s.id===id);
+  if(idx===-1) return;
+  const tipoSel=document.getElementById('pend-tipo-'+id)?.value;
+  if(!tipoSel){ alert('Selecione o tipo de pendência (correção de campo ou envio de documentação).'); return; }
+  if(tipoSel==='campo'){
+    const campoSel=document.getElementById('pend-campo-'+id)?.value;
+    if(!campoSel){ alert('Selecione o campo que precisa de correção.'); return; }
+    solicitacoes[idx].pendenciaCampo=campoSel;
+  } else {
+    solicitacoes[idx].pendenciaCampo=null;
+  }
+  solicitacoes[idx].pendenciaTipo=tipoSel;
+  solicitacoes[idx].pendenciaObs=document.getElementById('pend-obs-'+id)?.value||'';
+  solicitacoes[idx].pendenciaRespondida=false; // novo pedido — reseta até o solicitante responder
+  solicitacoes[idx].acaoRealizada=true;
+  sincronizarAtualizacao(solicitacoes[idx]);
+  atualizarDestaqueCard(id);
+  const bloco=document.getElementById('pend-block-'+id);
+  if(bloco) bloco.outerHTML=renderPendenciaForm(solicitacoes[idx]);
+  alert('Pendência salva. (A resposta do solicitante pela tela de acompanhamento chega na próxima etapa.)');
 }
 
 function salvarObsComFeedback(id, btn, origem='painel'){
@@ -3196,41 +2957,25 @@ function mudarStatus(id,val){
   solicitacoes[idx].status=val;
   solicitacoes[idx].dataStatus=new Date().toLocaleString('pt-BR');
   solicitacoes[idx].acaoRealizada=true;
+
+  // Preenche a observação automaticamente pros status de "aguardar matrícula"
+  if(STATUS_AUTO_TEXTO[val]) solicitacoes[idx].obs=STATUS_AUTO_TEXTO[val];
+
+  // Sai do status "Aguardando envio de dados" → limpa a pendência (ciclo encerrado)
+  if(val!=='Aguardando envio de dados'){
+    solicitacoes[idx].pendenciaTipo=null;
+    solicitacoes[idx].pendenciaCampo=null;
+    solicitacoes[idx].pendenciaObs=null;
+    solicitacoes[idx].pendenciaRespondida=false;
+  }
+
   sincronizarAtualizacao(solicitacoes[idx]);
-  const s=solicitacoes[idx];
   atualizarDestaqueCard(id);
+
+  // Re-renderiza o card inteiro — tem lógica condicional demais (obs, motivo,
+  // formulário de pendência) pra valer a pena remendar via DOM manual
   const cardEl=document.getElementById('card-'+id);
-  if(!cardEl) return;
-  const badgeEl=cardEl.querySelector('.badge');
-  if(badgeEl){
-    const m={
-      'Aguardando':'badge-wait','Pendente':'badge-pend',
-      'Pendente (aguardando interação)':'badge-pend',
-      'Aguardando dados completos':'badge-wait','Aguardando documentos de remoção':'badge-pend','Enviado ao SGMOP':'badge-prog',
-      'Resolvido parcialmente':'badge-prog','Resolvido':'badge-done',
-      'Negado':'badge-pend','Solicitar Carteirinha de Autorização':'badge-wait',
-      'Aguardando envio completo de dados':'badge-wait','Enviado à GGEPS':'badge-prog',
-      'Negado pela GGEPS':'badge-pend','Necessário aguardar: Matrícula recente':'badge-wait',
-      'Necessário aguardar: Matrícula em LICENÇA':'badge-wait'
-    };
-    badgeEl.className='badge '+(m[val]||'badge-wait');
-    badgeEl.textContent=val;
-  }
-  const actionsEl=cardEl.querySelector('.card-actions');
-  if(actionsEl){
-    let motivoEl=cardEl.querySelector('.motivo-negado');
-    if(val==='Negado'){
-      if(!motivoEl){
-        motivoEl=document.createElement('div');
-        motivoEl.className='motivo-negado';
-        motivoEl.style.cssText='margin-top:6px;width:100%';
-        motivoEl.innerHTML=`<input type="text" placeholder="Motivo da negação..." value="${s.motivoNegado||''}" onchange="salvarMotivo(${id},this.value)" style="font-size:12px;padding:5px 10px;border:1px solid #e0e0e0;border-radius:8px;width:100%;font-family:system-ui,sans-serif"/>`;
-        actionsEl.appendChild(motivoEl);
-      }
-    } else {
-      if(motivoEl) motivoEl.remove();
-    }
-  }
+  if(cardEl) cardEl.outerHTML=renderCard(solicitacoes[idx]);
 }
 
 async function excluir(id){
