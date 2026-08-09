@@ -61,6 +61,15 @@ body{font-family:system-ui,sans-serif;font-size:14px;color:#1a1a1a;background:#f
 .card-actions{display:flex;flex-wrap:wrap;gap:6px;border-top:1px solid #e0e0e0;padding-top:.75rem}
 .btn-sm{padding:5px 12px;border:1px solid #e0e0e0;border-radius:8px;background:#fff;font-size:12px;cursor:pointer;font-family:system-ui,sans-serif;color:#666}
 .btn-sm.active-filtro{background:#185FA5;border-color:#185FA5;color:#fff}
+.filtro-select-wrap{position:relative}
+.filtro-select-wrap .fs-icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:15px;pointer-events:none;z-index:1}
+.filtro-select-wrap .fs-arrow{position:absolute;right:14px;top:50%;transform:translateY(-50%);font-size:11px;color:#666;pointer-events:none}
+.filtro-select{width:100%;padding:11px 34px 11px 40px;border-radius:12px;border:1px solid #e0e0e0;font-size:14px;font-family:system-ui,sans-serif;background:#fff;color:#1a1a1a;appearance:none;-webkit-appearance:none;-moz-appearance:none;cursor:pointer;box-sizing:border-box}
+.pill-filtro{border-radius:20px;padding:9px 16px;font-size:13px;font-weight:500;border:1px solid #e0e0e0;background:#fff;color:#666;cursor:pointer;font-family:system-ui,sans-serif;display:inline-flex;align-items:center;gap:6px}
+.pill-filtro.active-filtro{background:#185FA5;border-color:#185FA5;color:#fff}
+#btn-filtro-aguardando{background:#FDEAEA;border-color:#FDEAEA;color:#A32D2D}
+#btn-filtro-aguardando.active-filtro{background:#A32D2D;border-color:#A32D2D;color:#fff}
+#btn-limpar-filtros{color:#185FA5;border-color:#e0e0e0}
 .btn-sm:hover{background:#f5f5f3}
 .btn-sm.primary{background:#185FA5;color:#fff;border-color:#185FA5}
 .btn-sm.primary:hover{background:#0C447C}
@@ -71,8 +80,6 @@ body{font-family:system-ui,sans-serif;font-size:14px;color:#1a1a1a;background:#f
 .pill{background:#fff;border:1px solid #e0e0e0;border-radius:20px;padding:3px 10px;font-size:12px;color:#666}
 .pill strong{color:#1a1a1a;font-weight:500}
 .email-body{background:#fff;border:1px solid #e0e0e0;border-radius:8px;padding:.875rem;font-size:13px;line-height:1.7;white-space:pre-wrap;color:#1a1a1a}
-.filter-bar{display:flex;gap:8px;margin-bottom:1rem;flex-wrap:wrap}
-.filter-bar select{font-family:system-ui,sans-serif;font-size:13px;padding:5px 10px;border-radius:20px;border:1px solid #e0e0e0;background:#fff;color:#1a1a1a}
 .empty{text-align:center;padding:2.5rem;color:#aaa;font-size:13px}
 .verif-row{display:flex;flex-wrap:wrap;gap:6px;margin:.5rem 0}
 .success-msg{background:#E8F5EE;border:1px solid #9FE1CB;border-radius:8px;padding:10px 14px;font-size:13px;color:#0F6E56;margin-top:.75rem;display:none}
@@ -168,6 +175,7 @@ body{font-family:system-ui,sans-serif;font-size:14px;color:#1a1a1a;background:#f
     </div>
     <span style="color:#185FA5;font-size:18px">›</span>
   </div>
+
   <div id="form-acesso" class="hidden">
     <div class="sec">
       <div class="sec-title">Tipo de solicitação</div>
@@ -528,6 +536,38 @@ body{font-family:system-ui,sans-serif;font-size:14px;color:#1a1a1a;background:#f
       </div>
     </div>
   </div>
+
+  <!-- Contatos úteis -->
+  <div onclick="toggleContatosUteis()"
+    style="border:1px dashed #9FE1CB;border-radius:12px;padding:.875rem 1rem;display:flex;align-items:center;justify-content:space-between;cursor:pointer;background:#f6fcf9;margin-top:.875rem;transition:background .15s"
+    onmouseenter="this.style.background='#E8F5EE'"
+    onmouseleave="this.style.background='#f6fcf9'">
+    <div style="display:flex;align-items:center;gap:.75rem">
+      <span style="font-size:22px">📞</span>
+      <div>
+        <div style="font-size:13px;font-weight:600;color:#0F6E56">Contatos úteis</div>
+        <div style="font-size:12px;color:#666;margin-top:1px">WhatsApp dos núcleos e da gerência regional</div>
+      </div>
+    </div>
+    <span id="contatos-uteis-seta" style="color:#0F6E56;font-size:18px;display:inline-block;transition:transform .15s">›</span>
+  </div>
+  <div id="contatos-uteis-lista" class="hidden" style="margin-top:.625rem"></div>
+
+  <!-- Links importantes -->
+  <div onclick="toggleLinksImportantes()"
+    style="border:1px dashed #b5d4f4;border-radius:12px;padding:.875rem 1rem;display:flex;align-items:center;justify-content:space-between;cursor:pointer;background:#f9fcff;margin-top:.625rem;transition:background .15s"
+    onmouseenter="this.style.background='#EBF3FB'"
+    onmouseleave="this.style.background='#f9fcff'">
+    <div style="display:flex;align-items:center;gap:.75rem">
+      <span style="font-size:22px">🔗</span>
+      <div>
+        <div style="font-size:13px;font-weight:600;color:#185FA5">Links importantes</div>
+        <div style="font-size:12px;color:#666;margin-top:1px">SIAGE, e-mail institucional, Educacenso</div>
+      </div>
+    </div>
+    <span id="links-importantes-seta" style="color:#185FA5;font-size:18px;display:inline-block;transition:transform .15s">›</span>
+  </div>
+  <div id="links-importantes-lista" class="hidden" style="margin-top:.625rem"></div>
 </div>
 
 <!-- PÁGINA CONSULTA -->
@@ -564,26 +604,58 @@ body{font-family:system-ui,sans-serif;font-size:14px;color:#1a1a1a;background:#f
     </div>
   </div>
   <div id="resumo-cards" style="margin-bottom:1rem"></div>
-  <div class="filter-bar">
-    <input type="text" id="painel-busca" placeholder="Buscar por nome ou matrícula..."
-      onkeydown="if(event.key==='Enter') buscarPainel()"
-      style="flex:1;min-width:180px;font-family:system-ui,sans-serif;font-size:13px;padding:7px 12px;border:1px solid #e0e0e0;border-radius:20px;outline:none"/>
-    <button class="btn-sm" onclick="buscarPainel()">🔍 Buscar</button>
-    <select id="fil-tipo" onchange="_filtroResumoAtivo=null;sincronizarFiltroStatus();renderCards()">
-      <option value="">Todos os tipos</option>
-      <option value="acesso">Acesso / E-mail</option>
-      <option value="lotacao">Lotação</option>
-    </select>
-    <select id="fil-status" onchange="_filtroResumoAtivo=null;renderCards()">
-      <option value="">Todos os status</option>
-    </select>
-    <select id="fil-escola" onchange="renderCards()">
-      <option value="">Todas as escolas</option>
-    </select>
-    <button class="btn-sm" id="btn-filtro-aguardando" onclick="toggleFiltroAguardandoPainel()">🔴 Aguardando ação</button>
-    <button class="btn-sm" id="btn-toggle-ocultos" onclick="toggleMostrarOcultosPainel()">🙈 Mostrar ocultados</button>
-    <button class="btn-sm" onclick="limparFiltrosPainel()">Limpar filtros</button>
+
+  <div class="sec" style="padding:1.5rem">
+
+    <div style="display:flex;gap:8px;margin-bottom:1.5rem;flex-wrap:nowrap">
+      <div style="flex:1;min-width:0;position:relative">
+        <span style="position:absolute;left:14px;top:50%;transform:translateY(-50%);color:#999;font-size:15px">🔍</span>
+        <input type="text" id="painel-busca" placeholder="Buscar solicitação por nome ou matrícula..."
+          onkeydown="if(event.key==='Enter') buscarPainel()"
+          style="width:100%;font-family:system-ui,sans-serif;font-size:14px;padding:11px 14px 11px 40px;border:1px solid #e0e0e0;border-radius:12px;outline:none;box-sizing:border-box"/>
+      </div>
+      <button class="btn-primary" onclick="buscarPainel()" style="width:auto;white-space:nowrap;flex-shrink:0;padding:0 16px;display:flex;align-items:center;gap:5px;margin-top:0">🔍 Buscar</button>
+    </div>
+
+    <div style="display:flex;align-items:center;gap:7px;margin-bottom:.875rem">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#185FA5" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
+      <span style="font-size:15px;font-weight:700;color:#1a1a1a">Filtros</span>
+    </div>
+
+    <div class="filtro-select-wrap" style="margin-bottom:.75rem">
+      <span class="fs-icon">🏫</span>
+      <select id="fil-escola" onchange="renderCards()" class="filtro-select">
+        <option value="">Todas as escolas</option>
+      </select>
+      <span class="fs-arrow">▾</span>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1.25rem">
+      <div class="filtro-select-wrap">
+        <span class="fs-icon">🏷️</span>
+        <select id="fil-tipo" onchange="_filtroResumoAtivo=null;sincronizarFiltroStatus();renderCards()" class="filtro-select">
+          <option value="">Todos os tipos</option>
+          <option value="acesso">Acesso / E-mail</option>
+          <option value="lotacao">Lotação</option>
+        </select>
+        <span class="fs-arrow">▾</span>
+      </div>
+      <div class="filtro-select-wrap">
+        <span class="fs-icon">✅</span>
+        <select id="fil-status" onchange="_filtroResumoAtivo=null;renderCards()" class="filtro-select">
+          <option value="">Todos os status</option>
+        </select>
+        <span class="fs-arrow">▾</span>
+      </div>
+    </div>
+
+    <div style="border-top:1px solid #eee;padding-top:1rem;display:flex;gap:10px;flex-wrap:wrap">
+      <button class="pill-filtro" id="btn-filtro-aguardando" onclick="toggleFiltroAguardandoPainel()">🔴 Aguardando ação</button>
+      <button class="pill-filtro" id="btn-toggle-ocultos" onclick="toggleMostrarOcultosPainel()">🙈 Mostrar ocultados</button>
+      <button class="pill-filtro" id="btn-limpar-filtros" onclick="limparFiltrosPainel()">🧹 Limpar filtros</button>
+    </div>
   </div>
+
   <div id="cards-list"></div>
 </div>
 
@@ -649,7 +721,69 @@ let arquivosSelecionados=[];
 // ══════════════════════════════════════════════
 //  INTEGRAÇÃO COM GOOGLE SHEETS
 // ══════════════════════════════════════════════
+// ══════════════════════════════════════════════
+//  CONTATOS ÚTEIS (tela inicial)
+// ══════════════════════════════════════════════
+const CONTATOS_UTEIS=[
+  {nome:'Camilo Vicente', cargo:'Chefe do NUDEA', desc:'Núcleo de Desenvolvimento da Escola e da Aprendizagem', tel:'5583999427058'},
+  {nome:'Priscila Queiroz', cargo:'Chefe do NUDPE', desc:'Núcleo de Protagonismo Estudantil', tel:'5583993766979'},
+  {nome:'Clara Izabelly', cargo:'Chefe do NUAFS', desc:'Núcleo Administrativo Financeiro', tel:'5583987388469'},
+  {nome:'Diego Victor', cargo:'Chefe do NUTCI', desc:'Núcleo de Infraestrutura e Suporte de Tecnologia da Informação', tel:'5583988463897'},
+  {nome:'Carlos Eduardo', cargo:'Gerente', desc:'2ª Gerência Regional de Educação', tel:'5583991274397'},
+];
+
+function toggleContatosUteis(){
+  const box=document.getElementById('contatos-uteis-lista');
+  const seta=document.getElementById('contatos-uteis-seta');
+  if(!box||!seta) return;
+  const abrindo=box.classList.contains('hidden');
+  if(abrindo && !box.dataset.montado){
+    box.innerHTML=CONTATOS_UTEIS.map(c=>`
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:.75rem;border:1px solid #e0e0e0;border-radius:10px;margin-bottom:8px;background:#fff">
+        <div>
+          <div style="font-size:13px;font-weight:600;color:#1a1a1a">${c.nome}</div>
+          <div style="font-size:12px;color:#666;margin-top:1px">${c.cargo} — ${c.desc}</div>
+        </div>
+        <a href="https://wa.me/${c.tel}" target="_blank" rel="noopener" style="flex-shrink:0;display:inline-flex;align-items:center;gap:5px;background:#E8F5EE;color:#0F6E56;font-size:12px;font-weight:600;padding:7px 12px;border-radius:20px;text-decoration:none;white-space:nowrap">💬 WhatsApp</a>
+      </div>`).join('');
+    box.dataset.montado='1';
+  }
+  box.classList.toggle('hidden');
+  seta.style.transform=abrindo?'rotate(90deg)':'none';
+}
+
 const SHEETS_URL='https://script.google.com/macros/s/AKfycbz_kCQt1bsOChFImeZD4cZ7XlN7_DG-swBnO_G0FJP5PyrHyl0G-Yj906ZTtvoA9Hw/exec';
+
+// ══════════════════════════════════════════════
+//  LINKS IMPORTANTES (tela inicial)
+// ══════════════════════════════════════════════
+const LINKS_IMPORTANTES=[
+  {nome:'SIAGE Professor', desc:'Portal do professor no SIAGE', url:'https://professor.see.pb.gov.br/'},
+  {nome:'SIAGE Escolar', desc:'Portal da escola no SIAGE', url:'https://escola.see.pb.gov.br/auth'},
+  {nome:'E-mail institucional', desc:'Gmail institucional', url:'https://gmail.com/'},
+  {nome:'Educacenso 2026', desc:'Censo escolar — ano corrente', url:'https://educacenso.inep.gov.br/'},
+  {nome:'Educacenso 2025', desc:'Censo escolar — ano anterior', url:'https://2025.educacenso.inep.gov.br'},
+];
+
+function toggleLinksImportantes(){
+  const box=document.getElementById('links-importantes-lista');
+  const seta=document.getElementById('links-importantes-seta');
+  if(!box||!seta) return;
+  const abrindo=box.classList.contains('hidden');
+  if(abrindo && !box.dataset.montado){
+    box.innerHTML=LINKS_IMPORTANTES.map(l=>`
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:.75rem;border:1px solid #e0e0e0;border-radius:10px;margin-bottom:8px;background:#fff">
+        <div>
+          <div style="font-size:13px;font-weight:600;color:#1a1a1a">${l.nome}</div>
+          <div style="font-size:12px;color:#666;margin-top:1px">${l.desc}</div>
+        </div>
+        <a href="${l.url}" target="_blank" rel="noopener" style="flex-shrink:0;display:inline-flex;align-items:center;gap:5px;background:#EBF3FB;color:#185FA5;font-size:12px;font-weight:600;padding:7px 12px;border-radius:20px;text-decoration:none;white-space:nowrap">🔗 Abrir</a>
+      </div>`).join('');
+    box.dataset.montado='1';
+  }
+  box.classList.toggle('hidden');
+  seta.style.transform=abrindo?'rotate(90deg)':'none';
+}
 
 // Grava no localStorage sem nunca travar quem chamou — o cache local é só um
 // atalho/fallback; se a cota do navegador estourar, isso NUNCA pode impedir
@@ -3232,14 +3366,46 @@ function renderCards(){
   list.innerHTML=fatia.map(it=>renderItemPainel(it)).join('')+renderPaginacao(itens.length,_paginaPainel,'mudarPaginaPainel','cards-list');
 }
 
+let _cardsExpandidos=new Set();
+
+function toggleCardExpandido(id){
+  if(_cardsExpandidos.has(id)) _cardsExpandidos.delete(id);
+  else _cardsExpandidos.add(id);
+  const idx=solicitacoes.findIndex(s=>s.id===id);
+  if(idx===-1) return;
+  const cardEl=document.getElementById('card-'+id);
+  if(cardEl) cardEl.outerHTML=renderCard(solicitacoes[idx]);
+}
+
 function renderCard(s){
   const isLot=s.tipo==='lotacao';
   const nome=isLot?s.prof:s.nome;
+  const expandido=_cardsExpandidos.has(s.id);
 
   // ── Tipo destacado ──────────────────────────
   const tipoPill=isLot
     ? `<span style="display:inline-block;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:600;background:#EBF3FB;color:#185FA5;letter-spacing:.01em">📋 Lotação</span>`
     : `<span style="display:inline-block;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:600;background:#E8F5EE;color:#0F6E56;letter-spacing:.01em">🔑 Acesso / E-mail</span>`;
+
+  const d=calcularDestaqueCard(s);
+
+  const headerHtml=`<div class="card-header" style="margin-bottom:${expandido?'.75rem':'0'}">
+      <div style="flex:1;min-width:0">
+        <div id="card-badges-${s.id}" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px">
+          ${d.tipo==='aguardando'?'<span class="badge-aguardando-acao" style="font-size:12px;font-weight:600;color:#92680A;background:#FEF9EC;border:1px solid #F5D97A;padding:2px 8px;border-radius:20px">🔴 Aguardando ação</span>':''}
+          ${tipoPill}
+          ${statusBadge(s.status)}
+        </div>
+        <div class="card-title">${nome}</div>
+        <div class="card-sub">${s.escola||''} · ${s.data}${s.loteProtocolo?` · <span style="color:#185FA5;font-weight:500">📦 Lote #${s.loteProtocolo} (${s.loteIndex||'?'}/${s.loteTotal||'?'})</span>`:''}</div>
+      </div>
+      <button type="button" class="btn-sm" onclick="toggleCardExpandido(${s.id})" style="flex-shrink:0">${expandido?'▴ Recolher':'▾ Detalhes'}</button>
+    </div>`;
+
+  // Card minimizado (padrão) — só o cabeçalho, sem o resto do conteúdo
+  if(!expandido){
+    return `<div class="card" id="card-${s.id}" style="${d.border?('border-left:3px solid '+d.border+';'):''}${d.bg?('background:'+d.bg+';'):''}">${headerHtml}</div>`;
+  }
 
   // ── Situação funcional (apenas lotação) ─────
   const situacaoItens = isLot ? [
@@ -3285,19 +3451,8 @@ function renderCard(s){
     return html;
   })();
 
-  const d=calcularDestaqueCard(s);
   return `<div class="card" id="card-${s.id}" style="${d.border?('border-left:3px solid '+d.border+';'):''}${d.bg?('background:'+d.bg+';'):''}">
-    <div class="card-header">
-      <div style="flex:1">
-        <div id="card-badges-${s.id}" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px">
-          ${d.tipo==='aguardando'?'<span class="badge-aguardando-acao" style="font-size:12px;font-weight:600;color:#92680A;background:#FEF9EC;border:1px solid #F5D97A;padding:2px 8px;border-radius:20px">🔴 Aguardando ação</span>':''}
-          ${tipoPill}
-          ${statusBadge(s.status)}
-        </div>
-        <div class="card-title">${nome}</div>
-        <div class="card-sub">${s.escola||''} · ${s.data}${s.loteProtocolo?` · <span style="color:#185FA5;font-weight:500">📦 Lote #${s.loteProtocolo} (${s.loteIndex||'?'}/${s.loteTotal||'?'})</span>`:''}</div>
-      </div>
-    </div>
+    ${headerHtml}
     <div class="card-body">${renderDados(s)}</div>
     ${situacaoHtml}
     ${docsHtml}
@@ -3408,10 +3563,16 @@ function renderDocDropdown(s){
 }
 
 function renderStatusSelect(s){
+  // GGEPS só faz sentido pra solicitação de acesso; SGMOP só pra lotação
+  const lista = STATUS_UNIFICADO.filter(st=>{
+    if(st==='Solicitação encaminhada à GGEPS') return s.tipo==='acesso';
+    if(st==='Solicitação encaminhada ao SGMOP') return s.tipo==='lotacao';
+    return true;
+  });
   // Se o status atual não está mais na lista (status antigo/legado), mostra ele mesmo
   // assim no topo — só pra exibição, ele desaparece assim que o admin trocar de status.
-  const extra = STATUS_UNIFICADO.includes(s.status) ? '' : `<option selected>${s.status}</option>`;
-  const opts = extra + STATUS_UNIFICADO.map(st=>`<option ${s.status===st?'selected':''}>${st}</option>`).join('');
+  const extra = lista.includes(s.status) ? '' : `<option selected>${s.status}</option>`;
+  const opts = extra + lista.map(st=>`<option ${s.status===st?'selected':''}>${st}</option>`).join('');
   return `<select onchange="mudarStatus(${s.id},this.value)" style="font-family:system-ui,sans-serif;font-size:12px;padding:4px 8px;border-radius:20px;border:1px solid #e0e0e0;background:#fff;color:#1a1a1a">${opts}</select>`;
 }
 
