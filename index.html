@@ -3920,4 +3920,57 @@ function gerarEmail(id, tipo){
   if(!box) return;
 
   box.innerHTML=`
-    <div style="display:flex;justify-content:space-between;align-items:center;
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.75rem">
+      <span style="font-size:12px;font-weight:600;color:#666;text-transform:uppercase;letter-spacing:.05em">Documento gerado</span>
+      <div style="display:flex;gap:6px">
+        <button class="btn-sm" onclick="toggleDocBox('${boxId}')" title="Minimizar">—</button>
+        <button class="btn-sm" onclick="fecharDocBox('${boxId}')" title="Fechar">✕</button>
+      </div>
+    </div>
+    <div class="email-meta">
+      <span class="pill"><strong>Para:</strong> ${dest}</span>
+      <span class="pill"><strong>Assunto:</strong> ${assunto}</span>
+    </div>
+    <div id="${boxId}-corpo">
+      <div class="email-body">${corpo.replace(/</g,'&lt;')}</div>
+      <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
+        <button class="btn-sm" onclick="copiar(\`${corpo.replace(/`/g,'\\`')}\`)">Copiar corpo</button>
+        <button class="btn-sm" onclick="abrirMailto('${dest}','${encodeURIComponent(assunto)}','${encodeURIComponent(corpo)}')">Abrir no e-mail</button>
+      </div>
+    </div>`;
+  box.style.display='block';
+}
+
+function toggleDocBox(boxId){
+  const corpo=document.getElementById(boxId+'-corpo');
+  if(!corpo) return;
+  const minimizado=corpo.style.display==='none';
+  corpo.style.display=minimizado?'block':'none';
+  // Atualiza o botão de minimizar
+  const box=document.getElementById(boxId);
+  if(!box) return;
+  const btnMin=box.querySelector('button[title="Minimizar"]');
+  if(btnMin) btnMin.textContent=minimizado?'—':'□';
+}
+
+function fecharDocBox(boxId){
+  const box=document.getElementById(boxId);
+  if(box) box.style.display='none';
+}
+
+function copiar(txt){navigator.clipboard.writeText(txt).then(()=>{const b=event.currentTarget;b.textContent='Copiado!';setTimeout(()=>b.textContent='Copiar corpo',2000);});}
+function abrirMailto(dest,assunto,corpo){window.open('mailto:'+dest+'?subject='+assunto+'&body='+corpo);}
+
+// Aplica templates editados salvos assim que todas as funções estão prontas
+aplicarTemplatesEditados();
+
+// Carrega a lista de escolas do escolas.txt e popula os selects dos formulários públicos
+carregarListaEscolasArquivo();
+
+// Se sobrou algo pendente de uma sessão anterior (navegador fechado com fila pendente),
+// mostra o aviso na hora e já tenta reenviar, em vez de ficar em silêncio até 2min
+atualizarIndicadorSync();
+tentarReenviarFila();
+</script>
+</body>
+</html>
