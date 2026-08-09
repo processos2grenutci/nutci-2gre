@@ -1293,6 +1293,8 @@ const STATUS_INICIAL=['Pendente','Pendente (aguardando interação)','Aguardando
 // - se o card já foi marcado explicitamente (acaoRealizada, setado por qualquer ação nova daqui pra frente)
 // então o card sai da condição "aguardando ação".
 function semAcao(s){
+  // Solicitante respondeu à pendência — precisa de revisão do admin
+  if(s.status==='Aguardando envio de dados' && s.pendenciaRespondida) return true;
   if(s.acaoRealizada) return false;
   const semObs=!s.obs||!String(s.obs).trim();
   const semMotivo=!s.motivoNegado||!String(s.motivoNegado).trim();
@@ -2087,6 +2089,85 @@ const STATUS_INFO = {
   },
 };
 
+// ── Resposta pública à pendência ("Aguardando envio de dados") ──
+function renderPendenciaPublica(s){
+  if(s.pendenciaTipo==='campo'){
+    const meta=(CAMPOS_CORRIGIVEIS[s.tipo]||[]).find(c=>c.key===s.pendenciaCampo);
+    const label=meta?meta.label:s.pendenciaCampo;
+    return `<div style="border-top:1px solid #F5D97A;padding-top:.75rem;margin-top:.75rem">
+      <div style="font-size:12px;font-weight:600;color:#92680A;margin-bottom:6px">✏️ Correção necessária: ${label}</div>
+      ${s.pendenciaObs?`<div style="font-size:12px;color:#7a5c10;margin-bottom:8px;line-height:1.5">${s.pendenciaObs}</div>`:''}
+      <input type="text" id="pend-valor-${s.id}" value="${String(s.valorPendente||'').replace(/"/g,'&quot;')}" style="width:100%;font-size:13px;padding:7px 10px;border:1px solid #e0e0e0;border-radius:8px;margin-bottom:8px;font-family:system-ui,sans-serif"/>
+      <button class="btn-sm primary" id="pend-btn-${s.id}" onclick="responderCampoPendencia(${s.id},'${s.pendenciaCampo}')" style="width:100%">Enviar correção</button>
+      <div id="pend-status-${s.id}" style="font-size:12px;margin-top:6px"></div>
+    </div>`;
+  }
+  if(s.pendenciaTipo==='documento'){
+    return `<div style="border-top:1px solid #F5D97A;padding-top:.75rem;margin-top:.75rem">
+      <div style="font-size:12px;font-weight:600;color:#92680A;margin-bottom:6px">📎 Documento necessário</div>
+      ${s.pendenciaObs?`<div style="font-size:12px;color:#7a5c10;margin-bottom:8px;line-height:1.5">${s.pendenciaObs}</div>`:''}
+      <div class="file-area" id="fa-pend-${s.id}" onclick="document.getElementById('file-pend-${s.id}').click()" style="margin-bottom:8px">
+        Clique para selecionar o documento (PDF, JPG ou PNG)
+        <input type="file" id="file-pend-${s.id}" accept=".pdf,.jpg,.jpeg,.png" onchange="responderDocumentoPendencia(this,${s.id})" style="display:none"/>
+      </div>
+      <div id="pend-status-${s.id}" style="font-size:12px"></div>
+    </div>`;
+  }
+  return '';
+}
+
+async function responderCampoPendencia(solId, campo){
+  const input=document.getElementById('pend-valor-'+solId);
+  const btn=document.getElementById('pend-btn-'+solId);
+  const statusEl=document.getElementById('pend-status-'+solId);
+  if(!input||!statusEl) return;
+  const valor=input.value.trim();
+  if(!valor){ statusEl.textContent='Preencha o campo antes de enviar.'; statusEl.style.color='#A32D2D'; return; }
+  if(btn) btn.disabled=true;
+  statusEl.textContent='Enviando...'; statusEl.style.color='#666';
+  try{
+    const resp=await fetch(SHEETS_URL,{
+      method:'POST',
+      headers:{'Content-Type':'text/plain'},
+      body:JSON.stringify({id:solId, _operacao:'responderCampo', campo, valor})
+    });
+    const data=await resp.json();
+    if(!data.ok) throw new Error(data.erro||'Não foi possível enviar.');
+    statusEl.textContent='✓ Correção enviada! Aguarde a revisão do NUTCI.';
+    statusEl.style.color='#0F6E56';
+    input.disabled=true;
+  }catch(e){
+    statusEl.textContent='Erro: '+e.message+'. Tente novamente.';
+    statusEl.style.color='#A32D2D';
+    if(btn) btn.disabled=false;
+  }
+}
+
+async function responderDocumentoPendencia(inp, solId){
+  const file=inp.files[0];
+  if(!file) return;
+  const fa=document.getElementById('fa-pend-'+solId);
+  const statusEl=document.getElementById('pend-status-'+solId);
+  if(fa){
+    fa.classList.add('has-file');
+    if(fa.childNodes[0]) fa.childNodes[0].textContent='1 arquivo selecionado';
+  }
+  if(statusEl){ statusEl.textContent='Enviando documento...'; statusEl.style.color='#185FA5'; }
+  try{
+    const resultado=await uploadArquivoCloudinary(file);
+    const resp=await fetch(SHEETS_URL,{
+      method:'POST',
+      headers:{'Content-Type':'text/plain'},
+      body:JSON.stringify({id:solId, _operacao:'responderDocumento', arquivo:resultado})
+    });
+    const data=await resp.json();
+    if(!data.ok) throw new Error(data.erro||'Não foi possível enviar.');
+    if(statusEl){ statusEl.textContent='✓ Documento enviado! Aguarde a revisão do NUTCI.'; statusEl.style.color='#0F6E56'; }
+  }catch(e){
+    if(statusEl){ statusEl.textContent='Erro ao enviar: '+e.message; statusEl.style.color='#A32D2D'; }
+  }
+}
+
 async function selecionarDocConsulta(inp, solId){
   const file=inp.files[0];
   if(!file) return;
@@ -2249,6 +2330,11 @@ async function buscarSolicitacao(){
       <div style="border-top:1px solid #f7c1c1;padding-top:.75rem">
         <div style="font-size:11px;font-weight:500;color:#A32D2D;text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px">❌ Motivo da negação</div>
         <div style="font-size:13px;color:#7a2020;line-height:1.6">${s.motivoNegado}</div>
+      </div>`:''}
+      ${s.pendenciaTipo&&!s.pendenciaRespondida?renderPendenciaPublica(s):''}
+      ${s.pendenciaTipo&&s.pendenciaRespondida?`
+      <div style="border-top:1px solid #9FE1CB;padding-top:.75rem;margin-top:.75rem">
+        <div style="font-size:12px;color:#0F6E56;font-weight:600">✓ Sua resposta foi enviada. Aguarde a revisão do NUTCI.</div>
       </div>`:''}
     </div>`;
   }).join('');
