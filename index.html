@@ -310,7 +310,7 @@ body{font-family:system-ui,sans-serif;font-size:14px;color:#1a1a1a;background:#f
 
     <div class="sec hidden" id="bloco-lote-pergunta">
       <div class="sec-title">👥 Deseja solicitar a lotação de mais de um professor?</div>
-      <p style="font-size:13px;color:#666;margin-bottom:1rem;line-height:1.6">Se você precisa realizar atualizações de lotação para vários professores da sua escola, pode enviar todas as solicitações de uma só vez.</p>
+      <p style="font-size:13px;color:#666;margin-bottom:1rem;line-height:1.6">Se você precisa atualizar a lotação de vários professores da sua escola, envie todas as solicitações de uma só vez.</p>
       <div style="display:flex;gap:10px;flex-wrap:wrap">
         <button type="button" class="btn-sm" onclick="escolherModoLotacao('individual')" style="flex:1;min-width:180px;padding:12px;font-size:13px">Continuar com lotação individual</button>
         <button type="button" class="btn-sm primary" onclick="escolherModoLotacao('lote')" style="flex:1;min-width:180px;padding:12px;font-size:13px">Iniciar lotação em lote</button>
@@ -475,7 +475,7 @@ body{font-family:system-ui,sans-serif;font-size:14px;color:#1a1a1a;background:#f
     <!-- MODO LOTE: vários professores numa solicitação só -->
     <div id="lote-form-multiplo" class="hidden">
       <div id="lote-blocos"></div>
-      <button type="button" class="btn-sm" onclick="adicionarProfessorLote()" style="width:100%;padding:10px;margin-bottom:1rem">+ Adicionar outro professor</button>
+      <button type="button" onclick="adicionarProfessorLote()" style="width:100%;padding:14px;margin-bottom:1.25rem;background:#EBF3FB;color:#185FA5;border:2px dashed #185FA5;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;font-family:system-ui,sans-serif">+ Adicionar outro professor</button>
       <div class="sec">
         <div style="font-size:13px;color:#666;margin-bottom:.75rem" id="lote-resumo">1 professor adicionado</div>
         <label style="display:flex;align-items:flex-start;gap:8px;font-size:13px;color:#1a1a1a;cursor:pointer;margin-bottom:1rem">
@@ -2110,7 +2110,6 @@ function renderBlocoProfessorLote(p,i){
         <label class="ropt ${p.licenca==='sim'?'sel':''}" onclick="selRLote(${i},'licenca','sim')"><input type="radio">Sim</label>
         <label class="ropt ${p.licenca==='nao'?'sel':''}" onclick="selRLote(${i},'licenca','nao')"><input type="radio">Não</label>
       </div>
-      ${p.licenca==='sim'?`<div class="alerta" style="display:block;margin-top:8px">⚠️ <strong>Atenção:</strong> professores em licença têm o acesso ao SIAGE bloqueado automaticamente. A liberação ocorre só após comunicação oficial da escola.</div>`:''}
     </div>
     <div class="field">
       <label>Mudou de escola nos últimos 6 meses?<span class="req">*</span></label>
@@ -2124,9 +2123,6 @@ function renderBlocoProfessorLote(p,i){
       <select onchange="atualizarCampoLote(${i},'escolaOrigem',this.value)" data-lote-escola-origem="${i}">
         <option value="">Selecione a escola...</option>
       </select>
-      <div style="background:#FEF9EC;border:1px solid #F5D97A;border-radius:8px;padding:10px 13px;font-size:12px;color:#7a5c10;line-height:1.6;margin-top:6px">
-        ⚠️ Para a lotação ser realizada, o processo de remoção precisa ter sido comunicado ao SGMOP.
-      </div>
     </div>`:''}
     <div class="field">
       <label>Documentos obrigatórios: Quadro Escolar + Diplomas<span class="req">*</span></label>
@@ -2137,7 +2133,6 @@ function renderBlocoProfessorLote(p,i){
       <div id="lote-arquivos-${i}" style="display:none"></div>
     </div>
     `:''}
-    <button type="button" class="btn-sm" style="width:100%;margin-top:.5rem" onclick="colapsarProfessorLote(${i})">Concluir e recolher este professor</button>
   </div>`;
 }
 
@@ -2162,11 +2157,6 @@ function editarProfessorLote(idx){
     const el=document.getElementById('lote-bloco-'+idx);
     if(el) el.scrollIntoView({behavior:'smooth',block:'start'});
   },50);
-}
-
-function colapsarProfessorLote(idx){
-  loteProfessores[idx].expandido=false;
-  renderBlocosLote();
 }
 
 function adicionarProfessorLote(){
