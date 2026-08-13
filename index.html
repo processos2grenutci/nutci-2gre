@@ -3345,8 +3345,12 @@ function renderItemPainel(item){
         <div style="font-weight:700;font-size:14px;color:#185FA5">Lote ${formatarProtocolo('lotacao',item.protocolo)} — ${totalReal} professor(es)${avisoIncompleto}</div>
         <div style="font-size:12px;color:#666;margin-top:2px">${nomes}</div>
       </div>
-      <button type="button" class="btn-sm" onclick="toggleLoteMinimizado(${item.protocolo})" style="flex-shrink:0">${minimizado?'▾ Expandir':'▴ Minimizar'}</button>
+      <div style="display:flex;gap:6px;flex-shrink:0">
+        <button type="button" class="btn-sm primary" onclick="gerarEmailLote(${item.protocolo})">📧 E-mail do lote</button>
+        <button type="button" class="btn-sm" onclick="toggleLoteMinimizado(${item.protocolo})">${minimizado?'▾ Expandir':'▴ Minimizar'}</button>
+      </div>
     </div>
+    <div class="email-modal" id="email-lote-${item.protocolo}"></div>
     ${minimizado?'':membros.map(m=>renderCard(m)).join('')}
   </div>`;
 }
@@ -3842,6 +3846,56 @@ function gerarOficio(id){
       <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
         <button class="btn-sm" onclick="copiar(\`${corpo.replace(/`/g,'\\`')}\`)">Copiar ofício</button>
       </div>
+    </div>`;
+  box.style.display='block';
+}
+
+// Monta um único e-mail consolidando todos os professores de um lote — mesmo
+// formato dos e-mails individuais, só que com um bloco de dados por professor.
+function gerarEmailLote(protocolo){
+  const membros=solicitacoes.filter(s=>s.loteProtocolo===protocolo).sort((a,b)=>(a.loteIndex||0)-(b.loteIndex||0));
+  if(membros.length===0) return;
+  membros.forEach(m=>marcarAcaoRealizada(m.id));
+
+  const escolas=[...new Set(membros.map(m=>m.escola).filter(Boolean))];
+  const intro = escolas.length===1
+    ? `Bom dia, Izabella.\n\nA ${escolas[0]} fez alterações em seu quadro e solicita que essas alterações sejam feitas no SIAGE. Encaminho abaixo os dados de cada professor e os documentos anexados:`
+    : `Bom dia, Izabella.\n\nEncaminho abaixo um lote de solicitações de lotação, com os dados de cada professor e os documentos anexados:`;
+
+  const blocos=membros.map((m,i)=>{
+    const situ=[];
+    if(m.comp==='sim') situ.push('Complementa carga horária'+(m.escolaComp?' em '+m.escolaComp:''));
+    if(m.mudou==='sim') situ.push('Mudou de escola'+(m.escolaOrigem?' (origem: '+m.escolaOrigem+')':''));
+    if(m.licenca==='sim') situ.push('Esteve em licença nos últimos 6 meses');
+    return `${i+1}. ${m.prof||'(sem nome)'}\n   Matrícula: ${m.mat||'—'}\n   Escola de lotação: ${m.escola||'—'}\n   WhatsApp: ${m.wpp||'—'}${situ.length?'\n   Situação: '+situ.join('; '):''}${linksArquivos(m)}`;
+  }).join('\n\n');
+
+  const corpo=`${intro}\n\n${blocos}\n\nPeço, por gentileza, um retorno assim que possível.${ASSINATURA}`;
+  const assunto=`2ª GRE | Lotação em lote — ${formatarProtocolo('lotacao',protocolo)} — ${membros.length} professor(es)`;
+  const dest='izabella_sousa022@escola.pb.gov.br';
+
+  const boxId='email-lote-'+protocolo;
+  const box=document.getElementById(boxId);
+  if(!box) return;
+  box.innerHTML=`
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.75rem">
+      <span style="font-size:12px;font-weight:600;color:#666;text-transform:uppercase;letter-spacing:.05em">E-mail do lote</span>
+      <div style="display:flex;gap:6px">
+        <button class="btn-sm" onclick="toggleDocBox('${boxId}')" title="Minimizar">—</button>
+        <button class="btn-sm" onclick="fecharDocBox('${boxId}')" title="Fechar">✕</button>
+      </div>
+    </div>
+    <div class="email-meta">
+      <span class="pill"><strong>Para:</strong> ${dest}</span>
+      <span class="pill"><strong>Assunto:</strong> ${assunto}</span>
+    </div>
+    <div id="${boxId}-corpo">
+      <div class="email-body">${corpo.replace(/</g,'&lt;')}</div>
+      <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
+        <button class="btn-sm" onclick="copiar(\`${corpo.replace(/`/g,'\\`')}\`)">Copiar corpo</button>
+        <button class="btn-sm" onclick="abrirMailto('${dest}','${encodeURIComponent(assunto)}','${encodeURIComponent(corpo)}')">Abrir no e-mail</button>
+      </div>
+      <div style="font-size:11px;color:#999;margin-top:8px">💡 Se o lote tiver muitos professores/documentos, prefira "Copiar corpo" — alguns aplicativos de e-mail cortam o texto de links "Abrir no e-mail" quando ficam muito longos.</div>
     </div>`;
   box.style.display='block';
 }
