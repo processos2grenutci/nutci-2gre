@@ -308,15 +308,6 @@ body{font-family:system-ui,sans-serif;font-size:14px;color:#1a1a1a;background:#f
       </div>
     </div>
 
-    <div class="sec hidden" id="bloco-lote-pergunta">
-      <div class="sec-title">👥 Deseja solicitar a lotação de mais de um professor?</div>
-      <p style="font-size:13px;color:#666;margin-bottom:1rem;line-height:1.6">Se você precisa atualizar a lotação de vários professores da sua escola, envie todas as solicitações de uma só vez.</p>
-      <div style="display:flex;gap:10px;flex-wrap:wrap">
-        <button type="button" class="btn-sm" onclick="escolherModoLotacao('individual')" style="flex:1;min-width:180px;padding:12px;font-size:13px">Continuar com lotação individual</button>
-        <button type="button" class="btn-sm primary" onclick="escolherModoLotacao('lote')" style="flex:1;min-width:180px;padding:12px;font-size:13px">Iniciar lotação em lote</button>
-      </div>
-    </div>
-
     <div id="lote-form-individual">
     <div class="sec">
       <div class="sec-title">Dados do professor</div>
@@ -1670,10 +1661,8 @@ function selR(grupo,valor,el){
   document.querySelectorAll('#rg-'+grupo+' .ropt').forEach(o=>o.classList.remove('sel'));
   el.classList.add('sel');
   if(grupo==='quem'){
-    const bloco=document.getElementById('bloco-lote-pergunta');
-    if(bloco) bloco.classList.toggle('hidden', valor!=='gestor');
-    // Se voltar pra "próprio professor" depois de já ter escolhido lote, volta tudo pro modo individual
-    if(valor==='professor' && modoLote) escolherModoLotacao('individual');
+    if(valor==='gestor') escolherModoLotacao('lote');
+    else escolherModoLotacao('individual');
   }
   if(grupo==='plataforma'){
     document.getElementById('alert-plataforma-siage').style.display=valor==='siage'?'block':'none';
@@ -2305,11 +2294,17 @@ async function enviarLote(){
         siage:p.siage, ecitLot:p.ecitLot, comp:p.comp, escolaComp:p.escolaComp||'',
         licenca:p.licenca, mudou:p.mudou, escolaOrigem:p.escolaOrigem||'',
         arquivos:arquivosEnviados, obs:'',
-        loteProtocolo:loteProtocolo, loteIndex:i+1, loteTotal:total,
       };
+      // Só marca como lote de verdade quando há mais de 1 professor — com 1 só,
+      // vira uma solicitação de lotação comum, sem agrupamento no painel
+      if(total>1){
+        sol.loteProtocolo=loteProtocolo;
+        sol.loteIndex=i+1;
+        sol.loteTotal=total;
+      }
       progEl.textContent='Salvando professor '+(i+1)+' de '+total+' ('+p.prof+')...';
       const sucesso=await salvarSol(sol);
-      resultados.push({ok:sucesso, idx:i, prof:p.prof});
+      resultados.push({ok:sucesso, idx:i, prof:p.prof, id:sol.id});
     }catch(e){
       resultados.push({ok:false, idx:i, prof:p.prof, erro:e.message});
     }
@@ -2320,7 +2315,13 @@ async function enviarLote(){
 
   const falhas=resultados.filter(r=>!r.ok);
   if(falhas.length===0){
-    mostrarConclusaoLote(loteProtocolo, resultados);
+    if(total===1){
+      // Só 1 professor — trata como uma solicitação de lotação comum, mesma tela de conclusão do fluxo individual
+      resetLoteDOM();
+      mostrarConclusao('lotacao', resultados[0].id);
+    }else{
+      mostrarConclusaoLote(loteProtocolo, resultados);
+    }
   }else{
     const sucessosIdx=resultados.filter(r=>r.ok).map(r=>r.idx);
     loteProfessores=loteProfessores.filter((p,i)=>!sucessosIdx.includes(i));
@@ -2335,13 +2336,11 @@ function resetLoteDOM(){
   const multiplo=document.getElementById('lote-form-multiplo');
   const individual=document.getElementById('lote-form-individual');
   const progWrap=document.getElementById('prog-lot-wrap');
-  const bloco=document.getElementById('bloco-lote-pergunta');
   const declaro=document.getElementById('lote-declaro');
   const blocosCont=document.getElementById('lote-blocos');
   if(multiplo) multiplo.classList.add('hidden');
   if(individual) individual.classList.remove('hidden');
   if(progWrap) progWrap.classList.remove('hidden');
-  if(bloco) bloco.classList.add('hidden');
   if(declaro) declaro.checked=false;
   if(blocosCont) blocosCont.innerHTML='';
   document.querySelectorAll('#rg-quem .ropt').forEach(o=>o.classList.remove('sel'));
